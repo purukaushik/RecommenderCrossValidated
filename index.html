@@ -1,69 +1,116 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
-    <title>Cross-Validated Visual  Recommender</title>
+    <title>Cross-Validated Visual Recommender</title>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <link rel="stylesheet" type="text/css"
-      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
-    <link rel="stylesheet" type="text/css" href="resources/css/sequences.css"/>
-    <link rel="stylesheet" type="text/css" href="resources/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="resources/css/bootstrap-theme.min.css"/>
-    <link rel="stylesheet" type="text/css" href="resources/css/miscellaneous.css"/>
-  </head>
-  <body>
+    <script src="galaxy.js"></script>
+    <script src="main-d3.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" type="text/css" href="resources/css/sequences.css" />
+    <link rel="stylesheet" type="text/css" href="resources/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="resources/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="resources/css/miscellaneous.css" />
+    <style>
+        .chart rect {
+            fill: steelblue;
+        }
+
+        .chart text {
+            fill: black;
+            font: 10px sans-serif;
+            text-anchor: end;
+        }
+
+        circle {
+            fill: rgb(31, 79, 80);
+            fill-opacity: .75;
+            stroke: rgb(31, 119, 80);
+            stroke-width: 1px;
+        }
+
+        .leaf circle {
+            fill: #ff7f0e;
+            fill-opacity: 1;
+        }
+
+        text {
+            font: 10px sans-serif;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: .6;
+        }
+    </style>
+</head>
+
+<body>
     <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Cross-Validated Visual Recommender</a>
-        </div>
-
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search">
+                <a class="navbar-brand" href="#">Cross-Validated Visual Recommender</a>
             </div>
-            <button type="submit" class="btn btn-default" onclick="event.preventDefault();">
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <form class="navbar-form navbar-right">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </div>
+                    <button type="submit" class="btn btn-default" onclick="event.preventDefault();">
               <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
             </button>
-          </form>     
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
+                </form>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
     </nav>
-    <div class="container-fluid">     
-      <div class="row">
-        <div class="col-md-8"> 
-          <div id="main">
-            <div id="sequence"></div>
-            <div id="chart"></div>
-          </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div id="main">
+                    <div id="sequence"></div>
+                    <div id="chart"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3 id="questionRecommendationHeading"></h3>
+                <div id="questionRecommendations"> </div>
+            </div>
         </div>
-        <div class="col-md-4"> 
-          <h3 id="questionRecommendationHeading"></h3>
-          <div id="questionRecommendations"> </div> 
+        <div class="row" id="moreCharts">
+            <div class="col-md-6">
+                <h3 id="activityHeading"></h3>
+                <div id="lineGraph" class="aGraph" style=""></div>
+            </div>
+            <div class="col-md-6">
+                <div id="bubble_chart" class="bGraph" style="">
+                    <svg class="chart"></svg>
+                    <script src="main-d3.js"></script>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="row" id="moreCharts">
-        <div class="col-md-6">
-          <h3 id="activityHeading"></h3>
-          <div id="lineGraph" class="aGraph" style=""></div>
-        </div>
-      </div>       
+
     </div>
-    
-    <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>  
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
     <!-- script for the bubble chart -->
     <!--<script type="text/javascript" src="resources/js/flare.js"></script>-->
     <script type="text/javascript" src="resources/js/sequence.js"></script>
     <script type="text/javascript" src="resources/js/recommender.js"></script>
     <script type="text/javascript" src="resources/js/bootstrap.min.js"></script>
-    
-  </body>
+    <script type="text/javascript">
+        main("Federal_Budget.csv");
+    </script>
+</body>
+
 </html>
