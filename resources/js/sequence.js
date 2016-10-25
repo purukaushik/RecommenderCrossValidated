@@ -118,6 +118,8 @@ function mouseover(d) {
     console.log("regression");
 
     var bub = d3.select("#bub").style("display", "block");
+  }else{
+    d3.select("#bub").style("display", "none");
   }
   var percentage = (100 * d.value / totalSize).toPrecision(3);
   var percentageString = percentage + "%";
