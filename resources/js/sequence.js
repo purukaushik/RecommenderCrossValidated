@@ -5,7 +5,7 @@ var radius = Math.min(width, height) / 2;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
 var b = {
-  w: 75, h: 30, s: 3, t: 10
+  w: 120, h: 30, s: 3, t: 10
 };
 
 // Mapping of step names to colors.
@@ -21,8 +21,32 @@ var colors = {
   "other": "#7b615c",
   "Arima": "#de783b",
   "forecasting": "#6ab975",
-  "modelling": "#a173d1",
-  "linear": "#bbbbbb"
+  "Model": "#a173d1",
+  "linear": "#bbbbbb",
+  "generalised":"#b71c1c",
+  "Ime4NLME":"#880e4f",
+  "random forest":"#0d47a1",
+  "mixed":"#4a148c",
+  "measuredesigns":"#29b6f6 ",
+  "Anova":"#26a69a",
+  "Repeated":"#4caf50",
+  "measures":"#ffc107",
+  "correlation":"#827717",
+  "confidence interval":"#f57f17",
+  "distribution":"#ff5722",
+  "regression":"#33691e",
+  "multiple":"#9e9e9e",
+  "logistic":"#607d8b",
+  "Predictive":"#263238",
+  "testing":"#00e676",
+  "significance":"#e91e63",
+  "techniques":"#311b92",
+  "visualization":"#4dd0e1",
+  "validated":"#bf360c",
+  "series":"#3e2723",
+  "analysis":"#795548",
+  "PCA":"#eeff41",
+
 };
 
 // Total size of all segments; we set this later, after loading the data.
