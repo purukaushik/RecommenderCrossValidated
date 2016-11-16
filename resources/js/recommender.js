@@ -19,19 +19,22 @@ function loadLineGraph() {
     var h = 400 - m[0] - m[2]; // height
     
     var data = [];
-   	for(i=0; i<10; i++) {
+   	for(i=0; i<7; i++) {
    		data.push(Math.ceil(Math.random()*12))
    	}
 
-    var x = d3.scale.linear().domain([0, 9]).range([0, w]);
-    var y = d3.scale.linear().domain([0, 12]).range([h, 0]);
-    var line = d3.svg.line()
+    var x = d3.scale.linear().domain([new Date(2010, 0, 1, 0), new Date(2016, 0, 1, 0)]).range([0, w]),
+    tick = x.ticks(d3.timeYear),
+    y = d3.scale.linear().domain([0, 12]).range([h, 0]),
+    line = d3.svg.line()
       .x(function(d,i) {         
-        return x(i) + 1; 
+        return x(i) + 10; 
       })
       .y(function(d) { 
         return y(d); 
       })
+
+    tick.map(x.tickFormat("%Y"))
 
     document.getElementById("lineGraph").innerHTML = "";
 
@@ -41,7 +44,7 @@ function loadLineGraph() {
         .append("svg:g")
         .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-    var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(true);
+    var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(false);
     graph.append("svg:g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + h + ")")

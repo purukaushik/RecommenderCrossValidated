@@ -11,7 +11,7 @@ var margin = {
         bottom: 20,
         left: 20
     },
-    width = (x - margin.right - margin.left),
+    width = (600 - margin.right - margin.left),
     height = .8 * (y - margin.top - margin.bottom);
 
 var root;
@@ -142,7 +142,6 @@ function unflatten(rows, rootName) {
         for (var c = 0, parent = root; c < names.length - 1; c++) { //cols
             var node, label = row[c];
             if (parent.name == row[c]) {
-                console.log(parent.name);
                 continue;
             }
             if (!parent.childmap[label]) {
