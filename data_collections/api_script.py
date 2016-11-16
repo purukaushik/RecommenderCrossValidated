@@ -18,73 +18,83 @@ def testing():
     resp = requests.get(url)
     resp_dres = resp.json()
     #print resp_dres
-    q_list = resp_dres['items']
+    q_list = resp_dres.get('items')
     comp_list = []
-    for i in q_list:
-        temp = i
-        comp_dict = {}
-        print temp
-        comp_dict['view_count'] = temp['view_count']
-        comp_dict['link'] = temp['link']
-        comp_dict['answer_count'] = temp['answer_count']
-        comp_dict['question_score'] = temp['score']
-        last_activity = temp['last_activity_date']
-        last_activity = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_activity))
-        comp_dict['last_activity'] = last_activity
-        start_date = temp['creation_date']
-        start_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_date))
-        comp_dict['start_date'] = start_date
-        comp_dict['Question_content'] = temp['body']
-        comp_dict['Title'] = temp['title']
-        comp_dict['question_id'] = temp['question_id']
-        comp_dict['tags'] = temp['tags']
-        try:
-            comp_dict['creater_id'] = temp['owner']['user_id']
-            comp_dict['creator_reputation'] = temp['owner']['reputation']
-            comp_dict['display_name'] = temp['owner']['display_name']
-        except:
-            pass
-        answer_lt = []
-        related_lt = []
-        if comp_dict['answer_count'] > 0:
-            url_a = "https://api.stackexchange.com/2.2/questions/" + str(comp_dict['question_id']) + "/answers?site=stats&filter=withbody"
-            resp = requests.get(url_a)
-            resp_dres = resp.json()
-            if 'items' in resp_dres:
-                a_list = resp_dres['items']
-                for j in a_list:
-                    temp_a = j
-                    #print temp_a
-                    temp_a_dict = {}
-                    temp_a_dict['answer_content'] = temp_a['body']
-                    temp_a_dict['question_score'] = temp_a['score']
-                    last_activity = temp_a['last_activity_date']
-                    last_activity = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_activity))
-                    temp_a_dict['last_activity'] = last_activity
-                    start_date = temp_a['creation_date']
-                    start_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_date))
-                    temp_a_dict['start_date'] = start_date
-                    temp_a_dict['creater_id'] = temp_a['owner']['user_id']
-                    temp_a_dict['creator_reputation'] = temp_a['owner']['reputation']
-                    temp_a_dict['display_name'] = temp_a['owner']['display_name']
-                    answer_lt.append(temp_a_dict)
-                # /questions/{ids}/related
-                url_b = "https://api.stackexchange.com/2.2/questions/" + str(comp_dict['question_id']) + "/related?site=stats&filter=withbody"
-                resp_b = requests.get(url_b)
-                resp_b = resp_b.json()
-                if 'items' in resp_b:
-                    b_list = resp_b['items']
-                    for k in b_list:
-                        temp_b = k
-                        temp_b_dict ={}
-                        temp_b_dict['related_ques_content'] = temp_b['body']
-                        temp_b_dict['tags'] = temp_b['tags']
-                        temp_b_dict['related_ques_title'] = temp_b['title']
-                        related_lt.append(temp_b_dict)
-        comp_dict['related_list'] = related_lt
-        comp_dict['answers_list'] = answer_lt
-        # print comp_dict
-        comp_list.append(comp_dict)
+    if q_list:
+        for i in q_list:
+            temp = i
+            comp_dict = {}
+            #print temp
+            comp_dict['view_count'] = temp.get('view_count')
+            comp_dict['link'] = temp.get('link')
+            comp_dict['answer_count'] = temp.get('answer_count')
+            comp_dict['question_score'] = temp.get('score')
+            last_activity = temp.get('last_activity_date')
+            if last_activity :
+                last_activity = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_activity))
+                comp_dict['last_activity'] = last_activity
+            start_date = temp.get('creation_date')
+            if start_date:
+                start_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_date))
+                comp_dict['start_date'] = start_date
+
+            comp_dict['Question_content'] = temp.get('body')
+            comp_dict['Title'] = temp.get('title')
+            comp_dict['question_id'] = temp.get('question_id')
+            comp_dict['tags'] = temp.get('tags')
+            try:
+                owner = temp.get('owner')
+                if owner:
+                    comp_dict['creater_id'] = owner.get('user_id')
+                    comp_dict['creator_reputation'] = owner.get('reputation')
+                    comp_dict['display_name'] = owner.get('display_name')
+            except:
+                pass
+            answer_lt = []
+            related_lt = []
+            if comp_dict['answer_count'] > 0:
+                url_a = "https://api.stackexchange.com/2.2/questions/" + str(comp_dict['question_id']) + "/answers?site=stats&filter=withbody"
+                resp = requests.get(url_a)
+                resp_dres = resp.json()
+                if 'items' in resp_dres:
+                    a_list = resp_dres['items']
+                    for j in a_list:
+                        temp_a = j
+                        #print temp_a
+                        temp_a_dict = {}
+                        temp_a_dict['answer_content'] = temp_a.get('body')
+                        temp_a_dict['question_score'] = temp_a.get('score')
+                        last_activity = temp_a.get('last_activity_date')
+                        if last_activity:
+                            last_activity = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_activity))
+                            temp_a_dict['last_activity'] = last_activity
+                        start_date = temp_a.get('creation_date')
+                        if start_date:
+                            start_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_date))
+                            temp_a_dict['start_date'] = start_date
+                        owner = temp_a.get('owner')
+                        if owner:
+                            temp_a_dict['creater_id'] = owner.get('user_id')
+                            temp_a_dict['creator_reputation'] = owner.get('reputation')
+                            temp_a_dict['display_name'] = owner.get('display_name')
+                        answer_lt.append(temp_a_dict)
+                    # /questions/{ids}/related
+                    url_b = "https://api.stackexchange.com/2.2/questions/" + str(comp_dict['question_id']) + "/related?site=stats&filter=withbody"
+                    resp_b = requests.get(url_b)
+                    resp_b = resp_b.json()
+                    if 'items' in resp_b:
+                        b_list = resp_b['items']
+                        for k in b_list:
+                            temp_b = k
+                            temp_b_dict ={}
+                            temp_b_dict['related_ques_content'] = temp_b.get('body')
+                            temp_b_dict['tags'] = temp_b.get('tags')
+                            temp_b_dict['related_ques_title'] = temp_b.get('title')
+                            related_lt.append(temp_b_dict)
+            comp_dict['related_list'] = related_lt
+            comp_dict['answers_list'] = answer_lt
+            # print comp_dict
+            comp_list.append(comp_dict)
 
     f.close()
     print comp_list
