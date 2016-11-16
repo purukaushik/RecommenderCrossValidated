@@ -16,6 +16,7 @@ def testing():
         temp = i
         comp_dict = {}
         comp_dict['view_count'] = temp['view_count']
+        comp_dict['link'] = temp['link']
         comp_dict['answer_count'] = temp['answer_count']
         comp_dict['question_score'] = temp['score']
         last_activity = temp['last_activity_date']
@@ -28,6 +29,9 @@ def testing():
         comp_dict['Title'] = temp['title']
         comp_dict['question_id'] = temp['question_id']
         comp_dict['tags'] = temp['tags']
+        comp_dict['creater_id'] = temp['owner']['user_id']
+        comp_dict['creator_reputation'] = temp['owner']['reputation']
+        comp_dict['display_name'] = temp['owner']['display_name']
         answer_lt = []
         related_lt = []
         if comp_dict['answer_count'] > 0:
@@ -96,7 +100,7 @@ def count_ln():
     print resp_b
 
 if __name__ == '__main__':
-    # testing_2()
+    testing_2()
     # count_ln()
-    testing()
+    # testing()
 
