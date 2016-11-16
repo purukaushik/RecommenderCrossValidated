@@ -37,6 +37,9 @@ def testing():
         comp_dict['Title'] = temp['title']
         comp_dict['question_id'] = temp['question_id']
         comp_dict['tags'] = temp['tags']
+        comp_dict['creater_id'] = temp['owner']['user_id']
+        comp_dict['creator_reputation'] = temp['owner']['reputation']
+        comp_dict['display_name'] = temp['owner']['display_name']
         answer_lt = []
         related_lt = []
         if comp_dict['answer_count'] > 0:
