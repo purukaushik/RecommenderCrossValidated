@@ -71,7 +71,7 @@ def testing():
     f.close()
     print comp_list
 
-    data = open('data.txt','w')
+    data = open('data' + var + '.txt', 'w')
     for item in comp_list:
         data.write("%s\n" % item)
     data.close()
