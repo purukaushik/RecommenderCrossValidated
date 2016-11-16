@@ -1,0 +1,10 @@
+Regression,algorithms,Logistic Regression,61.608
+Regression,algorithms,least-squares,91.038
+Regression,algorithms,SVM,28.003
+Regression,algorithms,Bayesian,74.871
+Regression,algorithms,gradient-descent,19.917
+Regression,algorithms,stochastic-approximation,3.432
+Logistic Regression,generalized-linear-model,,60.902
+Logistic Regression,maximum-likelihood,,21.353
+Logistic Regression,Bayesian,,10.358
+Logistic Regression,bias,,0.352
