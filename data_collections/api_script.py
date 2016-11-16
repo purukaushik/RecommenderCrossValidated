@@ -23,6 +23,7 @@ def testing():
     for i in q_list:
         temp = i
         comp_dict = {}
+        print temp
         comp_dict['view_count'] = temp['view_count']
         comp_dict['link'] = temp['link']
         comp_dict['answer_count'] = temp['answer_count']
@@ -37,9 +38,12 @@ def testing():
         comp_dict['Title'] = temp['title']
         comp_dict['question_id'] = temp['question_id']
         comp_dict['tags'] = temp['tags']
-        comp_dict['creater_id'] = temp['owner']['user_id']
-        comp_dict['creator_reputation'] = temp['owner']['reputation']
-        comp_dict['display_name'] = temp['owner']['display_name']
+        try:
+            comp_dict['creater_id'] = temp['owner']['user_id']
+            comp_dict['creator_reputation'] = temp['owner']['reputation']
+            comp_dict['display_name'] = temp['owner']['display_name']
+        except:
+            pass
         answer_lt = []
         related_lt = []
         if comp_dict['answer_count'] > 0:
@@ -79,7 +83,7 @@ def testing():
                         related_lt.append(temp_b_dict)
         comp_dict['related_list'] = related_lt
         comp_dict['answers_list'] = answer_lt
-        print comp_dict
+        # print comp_dict
         comp_list.append(comp_dict)
 
     f.close()
@@ -99,8 +103,8 @@ def testing():
 
 
 def testing_2():
-    # url = "https://api.stackexchange.com/2.2/questions?site=stats&filter=withbody"
-    url = "https://api.stackexchange.com/2.2/questions/245551/answers?site=stats&filter=withbody"
+    url = "https://api.stackexchange.com/2.2/questions?site=stats&filter=withbody"
+    # url = "https://api.stackexchange.com/2.2/questions/245551/answers?site=stats&filter=withbody"
     resp = requests.get(url)
     resp_dres = resp.json()
     print resp_dres
@@ -113,8 +117,7 @@ def count_ln():
     print resp_b
 
 if __name__ == '__main__':
-    #testing_2()
+    # testing_2()
     # count_ln()
     for i in range(3):
         testing()
-
