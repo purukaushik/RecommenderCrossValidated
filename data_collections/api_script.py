@@ -106,7 +106,7 @@ def testing():
     data.close()
     if len(comp_list):
         callscp(datafile)
-    #callscp(datafile)
+        #callscp(datafile)
         f = open('Counter.txt', 'w')
         var = int(var) + 1
         f.write(str(var))
