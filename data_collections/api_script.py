@@ -97,24 +97,25 @@ def testing():
             comp_list.append(comp_dict)
 
     f.close()
-    print comp_list
+    print len(comp_list)
 
     datafile = 'data' + var + '.txt'
     data = open(datafile, 'w')
     for item in comp_list:
         data.write("%s\n" % item)
     data.close()
-
-    callscp(datafile)
-    f = open('Counter.txt', 'w')
-    var = int(var) + 1
-    f.write(str(var))
-    f.close()
+    if len(comp_list):
+        callscp(datafile)
+        #callscp(datafile)
+        f = open('Counter.txt', 'w')
+        var = int(var) + 1
+        f.write(str(var))
+        f.close()
 
 
 def testing_2():
     url = "https://api.stackexchange.com/2.2/questions?site=stats&filter=withbody"
-    # url = "https://api.stackexchange.com/2.2/questions/245551/answers?site=stats&filter=withbody"
+    #url = "https://api.stackexchange.com/2.2/questions/245551/answers?site=stats&filter=withbody"
     resp = requests.get(url)
     resp_dres = resp.json()
     print resp_dres
@@ -127,7 +128,7 @@ def count_ln():
     print resp_b
 
 if __name__ == '__main__':
-    # testing_2()
-    # count_ln()
+    #testing_2()
+    #count_ln()
     for i in range(3):
         testing()
