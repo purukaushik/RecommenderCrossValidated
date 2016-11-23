@@ -110,6 +110,14 @@ def exporting_to_mongo():
     #  Iterating over the files
 
 
+def testing():
+    for i in range(1,20):
+        if os.path.isfile('data'+ str(i) +'.txt'):
+            print str(i) + ' exists'
+        else:
+            print str(i) + ' does not exist'
+
+
 def db_question_exists(recipient):
     mongobj = MongoClient()
     db = mongobj.dvproject
