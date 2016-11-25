@@ -90,3 +90,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+#this project
+data_collections/Counter.txt
+data_collections/ec2svr1.pem
