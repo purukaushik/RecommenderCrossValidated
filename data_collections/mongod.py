@@ -80,30 +80,30 @@ Global_repeating_question = 0
 def exporting_to_mongo():
     # Creating the objects for the Mongo DB
     global Global_repeating_question
-    for i in range(1, 20):
+    for i in range(1, 140):
         if os.path.isfile('data' + str(i) + '.txt'):
             print 'Running file ' + str(i)
-            file = open("data"+ str(i) +".txt", "r")
-            for line in file:
-                temp = line
-                temp = ast.literal_eval(temp)
-                check = db_question_exists(temp['question_id'])
-                if check == False:
-                    # Adding contents into the Question Database
-                    adding_question_database(temp, i)
+            with open("data"+ str(i) +".txt", "r") as file:
+                for line in file:
+                    temp = line
+                    temp = ast.literal_eval(temp)
+                    check = db_question_exists(temp['question_id'])
+                    if check == False:
+                        # Adding contents into the Question Database
+                        adding_question_database(temp, i)
 
-                    answer_count = temp['answer_count']
-                    if answer_count > 0:
-                        # Adding contents into the Answer Database
-                        adding_answer_database(temp, i)
+                        answer_count = temp['answer_count']
+                        if answer_count > 0:
+                            # Adding contents into the Answer Database
+                            adding_answer_database(temp, i)
 
-                    related_list = temp['related_list']
-                    if len(related_list) > 0:
-                        # Adding contents into the Related Question Database
-                        adding_related_database(temp, i)
-                else:
-                    Global_repeating_question += 1
-                    print 'The question id - ' + str(temp['question_id']) + ' has been repeated.'
+                        related_list = temp['related_list']
+                        if len(related_list) > 0:
+                            # Adding contents into the Related Question Database
+                            adding_related_database(temp, i)
+                    else:
+                        Global_repeating_question += 1
+                        print 'The question id - ' + str(temp['question_id']) + ' has been repeated.'
 
         else:
             print 'File number ' + str(i) + ' does not exist.'
