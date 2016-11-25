@@ -2,7 +2,7 @@ Example json
 ``` json
 {
 
-	"_id": "5838b73d10c7c46ef6a7f072",
+	"question_mongo_id": "5838b73d10c7c46ef6a7f072",
 	"View_count": 251,
 	"Display_name": "Steven Stewart-Gallus",
 	"Question_score": 5,
