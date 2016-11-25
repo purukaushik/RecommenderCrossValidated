@@ -2,7 +2,7 @@ Example json
 ``` json
 {
 	"data": [{
-
+			//---------QUESTION DATA ----------
 			"_id": "5838b73d10c7c46ef6a7f072",
 			"View_count": 251,
 			"Display_name": "Steven Stewart-Gallus",
@@ -23,7 +23,7 @@ Example json
 			"Creator_reputation": 166,
 
 
-
+			//list of answers
 			"answers":
 
 				[{
@@ -71,6 +71,7 @@ Example json
 
 
 			],
+			//list of topics
 			"topics": ["hypothesis-testing", "anova", "multiple-regression"
 
 			]
