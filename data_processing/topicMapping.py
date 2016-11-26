@@ -37,19 +37,21 @@ lda = gensim.models.ldamodel.LdaModel
 
 missedCount = 0
 
-questionSet = db.dbquestion.find()
+questionSet = db.dbquestion.find({"Question_id": 232106})
 for question in questionSet:
 	print question["Question_id"]
 	answers = []
-	if question["Answer_count"]:
+	answerObjectList = []
+	if question.get("Answer_count") > 0:
 		result = db.dbanswer.find({"Question_id" : question["Question_id"]})
-		answers = [ record['Answer_content'] for record in result]
+		for record in result: 
+			answers.append(record['Answer_content'])
+			answerObjectList.append(record)
 
 	doc = generateDocument(question, answers)
 	doc_tokenized = [clean(doc).split()] 	
 	
 	doc_term_matrix = [dictionary.doc2bow(token) for token in doc_tokenized]
-
 	if len(doc_term_matrix[0]) > 0:
 		ldamodel = lda(doc_term_matrix, num_topics=100, id2word = dictionary, passes=1000)
 		topicModel = ldamodel.print_topics(num_topics=100, num_words=100)
@@ -65,7 +67,11 @@ for question in questionSet:
 
 		termsWeightedList = [(v, k) for k, v in distOfTerms.items()]		
 		termsWeightedList.sort(reverse=True)
-		db.posts.insert({ "question":  question, "answers": answers, "topics": termsWeightedList[0:5] })	
+
+		post = question.copy()
+		post["answers"] = answerObjectList
+		post["topics"] = [ {"name": topic[1], "weight": topic[0]} for topic in termsWeightedList[0:5] ]
+		db.dbposts.insert(post)	
 	else:
 		missedCount += 1
 

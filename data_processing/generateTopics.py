@@ -4,6 +4,7 @@ from gensim import corpora
 from nltk.corpus import stopwords 
 from nltk.stem.wordnet import WordNetLemmatizer
 import string
+import json
 
 from pymongo import MongoClient
 
@@ -69,12 +70,12 @@ average = weightedProbability / len(distOfTerms.keys())
 print "Average: " + str(average)
 print "---"*30
 count = 0
-db.topics.drop()
+db.dbtopics.drop()
 for key, value in distOfTerms.iteritems():
 	if value >= average:
 		print key, value
 		count += 1
-		db.topics.insert({ "name": key, "weightedProbability": value })
+		db.dbtopics.insert({ "name": key, "weightedProbability": value })
 
 print count
 #print [y[1].split("*")[0] for y in x]
