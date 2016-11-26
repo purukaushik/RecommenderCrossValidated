@@ -56,7 +56,20 @@ Example json
 		"Start_date": "2016-11-14 14:54:53",
 		"Question_id": 245931
 	}],
-	"topics": ["hypothesis-testing", "anova", "multiple-regression"]
+	"topics": [ 
+		{
+			"name" : "hypothesis-testing", 
+			"weight" : 1.3809999999999993 
+		},
+		{
+			"name" : "wilcoxon",
+			"weight" : 0.8960000000000006
+		},
+		{
+			"name" : "white-noise",
+			"weight" : 0.8960000000000006
+		}
+	]
 
 }
 ```
