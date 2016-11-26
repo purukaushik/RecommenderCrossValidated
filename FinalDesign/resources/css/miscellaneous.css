@@ -1,0 +1,32 @@
+.uppercase {
+	text-transform: uppercase; 
+}
+body h1 {
+  font-size: 20px;
+  font-weight: 300;
+}
+#sideboard {
+  min-height: 100vh;
+  background: #333;
+  margin-top: -20px;
+  color: #FFF;
+}
+div{
+  /*color: #f39c12; */
+}
+nav div.navbar-form button .glyphicon-search{
+  font-size: 20px;
+}
+#recommendations {
+  min-height: 100vh;
+  background: #ddd;
+  margin-top: -20px;
+  color: #333;
+}
+#recommendations a{
+	background: aliceblue;
+    display: block;
+    padding: 7px 8px;
+    margin: 10px 0px;
+    color: #444;
+}
