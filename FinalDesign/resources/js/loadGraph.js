@@ -111,13 +111,15 @@
         b: {radius: 25, type: 'C', name: 'Linear Regression'},
         c: {radius: 35, type: 'S', name: 'time series'},
         d: {radius: 20, type: 'S', name: 'R Studio'},
-        e: {radius: 40, type: 'C', name: 'statistics'},
+        e: {radius: 40, type: 'C', name: 'Statistics'},
+        f: {radius: 40, type: 'C', name: 'Anova'},
       }, 
       edges:{
         a:{ b:{weight: 1},
             c:{weight: 3},
             d:{weight: 2},
-            e:{weight: 2}
+            e:{weight: 2},
+            f:{weight: 4},
           }
         }
      })

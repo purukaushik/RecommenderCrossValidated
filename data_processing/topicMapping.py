@@ -37,7 +37,7 @@ lda = gensim.models.ldamodel.LdaModel
 
 missedCount = 0
 
-questionSet = db.dbquestion.find({"Question_id": 232106})
+questionSet = db.dbquestion.find()
 for question in questionSet:
 	print question["Question_id"]
 	answers = []

@@ -11,10 +11,6 @@ from pymongo import MongoClient
 mongobj = MongoClient()
 db = mongobj.dvproject
 
-stop = set(stopwords.words('english'))
-exclude = set(string.punctuation) 
-lemma = WordNetLemmatizer()
-
 def clean(doc):
     stop_free = " ".join([i for i in doc.lower().split() if i not in stop])
     punc_free = ''.join(ch for ch in stop_free if ch not in exclude)
@@ -24,9 +20,10 @@ def clean(doc):
 def loadTermsFromCSV(path, index=0):
 	terms = []
 	with open(path, 'rb') as csvfile:
-		reader = csv.reader(csvfile, delimiter=' ', quotechar='"')
-		for row in reader:			
-			terms.append(row[index])
+		reader = csv.reader(csvfile, delimiter='|', quotechar='"')		
+		for row in reader:	
+			if len(row) > 0:		
+				terms.append(row[index].strip())
 	return terms
 
 def generateDocument():
@@ -37,11 +34,14 @@ def generateDocument():
 	doc = " ".join(questions + answers)
 	return doc
 
-	return "I am very new to time series analysis and I couldn't find a satisfying answer on other posts about statistical significance.\nI have 3 times series for 3 distinct stations. Each of them corresponds to an average of 3 distinct measurements and display a striking, coherent change.\nI am asked to present the statistical significance of this change (not to run a significance test) with at least 95% confidence limits on my plots.\nMy  biggest problem is that I am not 100% sure I understand what is expected from me ,and I only one shot to do this. Does that mean I should put the confidence interval based on the measurements used in the average?"
+terms = [loadTermsFromCSV("topicModelling.csv")]
+
+stop = set(stopwords.words('english'))
+exclude = set(string.punctuation) 
+lemma = WordNetLemmatizer()
 
 doc = generateDocument()
 doc_tokenized = [clean(doc).split()] 
-terms = [loadTermsFromCSV("ShortQueryResults.csv")]
 
 dictionary = corpora.Dictionary(terms)
 doc_term_matrix = [dictionary.doc2bow(doc) for doc in doc_tokenized]
