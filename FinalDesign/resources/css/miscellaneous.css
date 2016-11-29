@@ -20,13 +20,28 @@ nav div.navbar-form button .glyphicon-search{
 #recommendations {
   min-height: 100vh;
   background: #ddd;
+  background: #3EC5D2;  /*#17A9BA;*/
   margin-top: -20px;
   color: #333;
 }
+#recommendations h1 {
+  color: #FFF;
+}
+#recommendations #description {
+  padding: 10px;
+  text-align: justify;
+  background: #C5FCFC;
+  box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
+  margin-top: 10px;
+  border-radius: 2px;
+}
 #recommendations a{
 	background: aliceblue;
-    display: block;
-    padding: 7px 8px;
-    margin: 10px 0px;
-    color: #444;
+  display: block;
+  padding: 7px 8px;
+  margin: 10px 0px;
+  color: #444;
+  color: #045858;
+  box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
 }
+

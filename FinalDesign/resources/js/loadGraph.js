@@ -28,7 +28,7 @@
 
         particleSystem.eachNode(function(node, pt){          
           var w = 10 //+ Math.random() * 30
-          ctx.fillStyle = (node.data.type == 'R') ? "grey" : (node.data.type == 'C') ? "orange" : "green"
+          ctx.fillStyle = (node.data.type == 'R') ? "grey" : (node.data.type == 'C') ? "#F7B32B" : "#8BD854"
           //ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
           ctx.beginPath();
           radius = node.data.radius
