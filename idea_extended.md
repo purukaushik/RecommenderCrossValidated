@@ -1,22 +1,19 @@
 # Motivation and Relevant Work
 
-PISA
+- Lu, Y. & **Hsiao, I-H.** Personalized Information Seeking Assistant (PiSA): From Programming Information Seeking To Learning, *Information Retrieval Journal*
+- Parra, D., Brusilovsky, P., & Trattner, C. (2014). *See what you want to see: visual user-driven approach for hybrid recommendation*. Paper presented at the Proceedings of the 19th international conference on Intelligent User Interfaces, Haifa, Israel.
 
-what to read next?
+# Questions
 
-# Research Questions
+How can we get a self-motivated learner to discover topics through visual and  textual recommendations?
 
-Who  -  audience ji
-
-WHY - 
-
-HOW
+How can we leverage the 
 
 # Methodology
 
-How we topic model
+How we topic model — list of tags from stackexchange, wikipedia titles and the question/answer corpus to generate top-5 topic labels for each post(question+answers) using LDA.
 
-Talk about how we find similarity between topics
+We measure similarity between topics by 1) computing cosine similarity between topics  using their question/answer text and by 2) computing a collaborative filtering item-based similarity score from users and their interactions with posts belonging to various topics.
 
 —do— apply filters
 
