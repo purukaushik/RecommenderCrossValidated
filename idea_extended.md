@@ -14,11 +14,19 @@ HOW
 
 # Methodology
 
+How we topic model
+
+Talk about how we find similarity between topics
+
+—do— apply filters
+
 # Data Collection
+
+crawling, cleaning, aggregation, etc
 
 # Findings
 
-
+correlation between topics in collaborative and content based recommendations
 
 
 
