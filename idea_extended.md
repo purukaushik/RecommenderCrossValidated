@@ -19,7 +19,9 @@ We measure similarity between topics by 1) computing cosine similarity between t
 
 # Data Collection
 
-crawling, cleaning, aggregation, etc
+Cleaned and aggregated harvested data over the time frame of 6 years(2010 - present) of all forum posts tagged with topic 'R' from stats.stackexchange.com. 
+{  9158 questions, 6756 answers, 42711 related questions }
+
 
 # Findings
 
