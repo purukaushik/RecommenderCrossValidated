@@ -7,7 +7,7 @@
 
 How can we get a self-motivated learner to discover topics through visual and  textual recommendations?
 
-How can we leverage the contribution patterns over different topics of study on an online discussion board like stackoverflow to enable learners to discover topics of interest?
+How can we leverage the contribution patterns over different topics of study on an online discussion board like stackexchange to enable learners to discover topics of interest?
 
 # Methodology
 
