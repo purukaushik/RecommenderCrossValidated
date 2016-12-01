@@ -18,7 +18,7 @@ app.config.from_object(__name__)
 conn = MongoClient(host=app.config['MONGODB_HOST'], port=app.config['MONGODB_PORT'])
 
 
-def get(algo,topic):
+def get(algo, topic, list_topics=False):
     if algo == 'collabf':
         db_collection = conn[DB][COLLAB_FILTER]
     elif algo == 'cosine':
@@ -26,9 +26,16 @@ def get(algo,topic):
     else:
         return {}
     cursor = db_collection.find({"name": topic}, {"related_topics": 1})
-    docs = [x.get("related_topics") for x in cursor]
+
+    related_topics = [x.get("related_topics") for x in cursor]
+    if list_topics:
+        related_topics_list = [x.get('name') for x in related_topics[0]]
+
+        return {"topic":  topic,
+                "related_topics_list": related_topics_list
+                }
     return {"topic": topic,
-            "related_topics": docs}
+            "related_topics": related_topics[0]}
 
 
 @app.route("/", strict_slashes=False)
@@ -46,14 +53,22 @@ def heartbeat():
 @app.route("/<algo>", methods=["GET"])
 def get_filter_data(algo):
     if len(request.args) != 0:
+
         topic = request.args.get('topic')
-        return jsonify(get(algo, topic))
+        if topic:
+            topics_list = request.args.get('list')
+            if topics_list:
+                return jsonify(get(algo, topic, topics_list))
+            else:
+                return jsonify(get(algo, topic))
+    return jsonify({})
+
 
 if __name__ == '__main__':
     if not app.debug:
         import logging
-        from logging import FileHandler
-        file_handler = FileHandler(filename="app_debug.log")
+        from logging.handlers import RotatingFileHandler
+        file_handler = RotatingFileHandler(filename="app_debug.log")
         file_handler.setLevel(logging.ERROR)
         app.logger.addHandler(file_handler)
     app.run(host='0.0.0.0', port=3000)
