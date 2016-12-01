@@ -1,4 +1,5 @@
 ## Usage
+
 0. If a topic doesn't exist in the database, you get an empty json like this
 ```json
     {
@@ -28,7 +29,7 @@
 
 2. Content based cosine similarities for a topic=likert
 ```bash
-    curl 
+    curl http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000/cosine?topic=likert
 ```
   returns all related topics to topic `likert` based on cosine similarity.
   Output looks like this:
@@ -44,3 +45,24 @@
       "topic": "likert"
   }
 ```
+
+3. List topics :
+
+   `curl http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000/collabf?topic=likert&list=true`
+
+   Result looks like this:
+
+   ```json
+   {
+     "related_topics_list": [
+       "invariance", 
+       "likert", 
+       "nnet", 
+       ...
+       "aic"
+     ], 
+     "topic": "likert"
+   }
+   ```
+
+   ​
