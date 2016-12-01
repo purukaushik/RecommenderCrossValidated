@@ -2,7 +2,8 @@ from flask import Flask, request, Response, jsonify
 from pymongo import MongoClient
 
 # MONGODB CONFIGURATION
-MONGODB_HOST = 'localhost'
+#MONGODB_HOST = 'localhost'
+MONGODB_HOST = 'ec2-52-43-158-164.us-west-2.compute.amazonaws.com'
 MONGODB_PORT = 27017
 DB = 'dvproject'
 PAGE_NO = 'pageNo'
@@ -47,3 +48,6 @@ def get_filter_data(algo):
     if len(request.args) != 0:
         topic = request.args.get('topic')
         return jsonify(get(algo, topic))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000)
