@@ -1,7 +1,3 @@
-from StringIO import StringIO
-from datetime import datetime
-from gzip import GzipFile
-
 from flask import Flask, request, Response, jsonify
 from pymongo import MongoClient
 
@@ -46,8 +42,8 @@ def heartbeat():
     })
 
 
-@app.route("/<algo>", methods=["POST"])
-def getFilterData(algo):
+@app.route("/<algo>", methods=["GET"])
+def get_filter_data(algo):
     if len(request.args) != 0:
         topic = request.args.get('topic')
         return jsonify(get(algo, topic))
