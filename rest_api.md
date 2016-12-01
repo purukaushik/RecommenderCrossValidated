@@ -1,4 +1,11 @@
 ## Usage
+0. If a topic doesn't exist in the database, you get an empty json like this
+  ```json
+    {
+    "related_topics": [],
+    "topic": "lik"
+  }
+  ```
 1. Collab filtering metrics for a topic=likert
 
   ```bash
