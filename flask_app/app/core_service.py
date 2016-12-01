@@ -26,7 +26,7 @@ def get(algo,topic):
     else:
         return {}
     cursor = db_collection.find({"name": topic}, {"related_topics": 1})
-    docs = [x for x in cursor]
+    docs = [x.get("related_topics") for x in cursor]
     return {"topic": topic,
             "related_topics": docs}
 
@@ -50,4 +50,10 @@ def get_filter_data(algo):
         return jsonify(get(algo, topic))
 
 if __name__ == '__main__':
+    if not app.debug:
+        import logging
+        from logging import FileHandler
+        file_handler = FileHandler(filename="app_debug.log")
+        file_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(file_handler)
     app.run(host='0.0.0.0', port=3000)
