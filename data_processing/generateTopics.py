@@ -7,9 +7,15 @@ import string
 import json
 
 from pymongo import MongoClient
-
-mongobj = MongoClient()
+MONGODB_HOST = 'ec2-52-43-158-164.us-west-2.compute.amazonaws.com'
+MONGODB_PORT = 27017
+mongobj = MongoClient(host=MONGODB_HOST, port=MONGODB_PORT)
 db = mongobj.dvproject
+QUESTIONS = "dbquestion"
+ANSWERS = "dbanswer"
+TOPICS = "dbtopics"
+POSTS = "dbposts"
+
 
 def clean(doc):
     stop_free = " ".join([i for i in doc.lower().split() if i not in stop])
@@ -19,22 +25,26 @@ def clean(doc):
 
 def loadTermsFromCSV(path, index=0):
 	terms = []
+	termsDescMap = {}
 	with open(path, 'rb') as csvfile:
 		reader = csv.reader(csvfile, delimiter='|', quotechar='"')		
 		for row in reader:	
-			if len(row) > 0:		
-				terms.append(row[index].strip())
-	return terms
+			if len(row) > 0:
+				k = row[index].strip()
+				v = row[index+1].strip()
+				terms.append(k)
+				termsDescMap[k] = v
+	return [terms], termsDescMap
 
 def generateDocument():
-	result = db.dbquestion.find()
+	result = db[QUESTIONS].find()
 	questions = [ record['Question_content'] for record in result]
-	result = db.dbanswer.find()
+	result = db[ANSWERS].find()
 	answers = [ record['Answer_content'] for record in result]
 	doc = " ".join(questions + answers)
 	return doc
 
-terms = [loadTermsFromCSV("topicModelling.csv")]
+terms, termsDescMap = loadTermsFromCSV("topicModelling.csv")
 
 stop = set(stopwords.words('english'))
 exclude = set(string.punctuation) 
@@ -70,12 +80,14 @@ average = weightedProbability / len(distOfTerms.keys())
 print "Average: " + str(average)
 print "---"*30
 count = 0
-db.dbtopics.drop()
+db[TOPICS].drop()
 for key, value in distOfTerms.iteritems():
 	if value >= average:
 		print key, value
 		count += 1
-		db.dbtopics.insert({ "name": key, "weightedProbability": value })
+		print { "name": key, "weightedProbability": value, "desc" : termsDescMap.get(key) }
+		exit()
+		# db[TOPICS].insert({ "name": key, "weightedProbability": value, "desc" : termsDescMap.get(key) })
 
 print count
 #print [y[1].split("*")[0] for y in x]
