@@ -13,9 +13,11 @@ mongobj = MongoClient(host=MONGODB_HOST, port=MONGODB_PORT)
 db = mongobj.dvproject
 QUESTIONS = "dbquestion"
 ANSWERS = "dbanswer"
-TOPICS = "dbtopics"
+TOPICS = "dbtopics1"
 POSTS = "dbposts"
 
+blackList = ["Autoregressive\\u2013moving-average model", "Lehmann\\u2013Scheff\xe9 theorem", "ruby", "SAS (software)", "untagged", "error", "Python (programming language)",
+			 "runs" ]
 
 def clean(doc):
     stop_free = " ".join([i for i in doc.lower().split() if i not in stop])
@@ -28,12 +30,30 @@ def loadTermsFromCSV(path, index=0):
 	termsDescMap = {}
 	with open(path, 'rb') as csvfile:
 		reader = csv.reader(csvfile, delimiter='|', quotechar='"')		
-		for row in reader:	
+		for row in reader:
+			index = 0
 			if len(row) > 0:
+				if row[index].strip() == '':
+					if len(row) > index+1:
+						index+=1
+					else:
+						continue
 				k = row[index].strip()
-				v = row[index+1].strip()
+				if k in blackList:
+					continue
+				index += 1
+				if row[index].strip() == '':
+					if len(row) > index + 1:
+						index += 1
+					else:
+						continue
+				# print row
+
+				v = row[index].strip()
 				terms.append(k)
 				termsDescMap[k] = v
+				# print v
+
 	return [terms], termsDescMap
 
 def generateDocument():
@@ -46,7 +66,14 @@ def generateDocument():
 
 terms, termsDescMap = loadTermsFromCSV("topicModelling.csv")
 
-stop = set(stopwords.words('english'))
+try:
+	stop = set(stopwords.words('english'))
+except Exception:
+	import nltk
+	nltk.download()
+	stop = set(stopwords.words('english'))
+
+print "Done getting stop words"
 exclude = set(string.punctuation) 
 lemma = WordNetLemmatizer()
 
@@ -57,7 +84,9 @@ dictionary = corpora.Dictionary(terms)
 doc_term_matrix = [dictionary.doc2bow(doc) for doc in doc_tokenized]
 
 lda = gensim.models.ldamodel.LdaModel
+print "Generating lda model..."
 ldamodel = lda(doc_term_matrix, num_topics=100, id2word = dictionary, passes=1000)
+print "Done lda model"
 topicModel = ldamodel.print_topics(num_topics=100, num_words=100)
 
 distOfProbability = {}
@@ -83,11 +112,8 @@ count = 0
 db[TOPICS].drop()
 for key, value in distOfTerms.iteritems():
 	if value >= average:
-		print key, value
 		count += 1
-		print { "name": key, "weightedProbability": value, "desc" : termsDescMap.get(key) }
-		exit()
-		# db[TOPICS].insert({ "name": key, "weightedProbability": value, "desc" : termsDescMap.get(key) })
+		db[TOPICS].insert({ "name": key[1:-1], "weightedProbability": value, "desc" : termsDescMap.get(key[1:-1]) })
 
 print count
 #print [y[1].split("*")[0] for y in x]

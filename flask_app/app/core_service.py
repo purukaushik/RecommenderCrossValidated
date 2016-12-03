@@ -1,8 +1,9 @@
 from flask import Flask, request, Response, jsonify
+from flask_cors import CORS
 from pymongo import MongoClient
 
 # MONGODB CONFIGURATION
-#MONGODB_HOST = 'localhost'
+# MONGODB_HOST = 'localhost'
 MONGODB_HOST = 'ec2-52-43-158-164.us-west-2.compute.amazonaws.com'
 MONGODB_PORT = 27017
 DB = 'dvproject'
@@ -14,6 +15,7 @@ TOPICS = 'dbtopics0'
 # Flask INIT
 app = Flask(__name__)
 app.config.from_object(__name__)
+CORS(app)
 
 # MONGODB Connection
 conn = MongoClient(host=app.config['MONGODB_HOST'], port=app.config['MONGODB_PORT'])
@@ -32,17 +34,18 @@ def get(algo, topic, list_topics=False):
     if list_topics:
         related_topics_list = [x.get('name') for x in related_topics[0]]
 
-        return {"topic":  topic,
+        return {"topic": topic,
                 "related_topics_list": related_topics_list
                 }
-    return {"topic": topic,
-            "related_topics": related_topics[0]}
+    return related_topics[0]
+
 
 def get_topics():
     db_collection = conn[DB][TOPICS]
     cursor = db_collection.find()
     topics = [topic.get("name") for topic in cursor]
     return {"topics": topics}
+
 
 @app.route("/", strict_slashes=False)
 def home():
@@ -75,10 +78,22 @@ def get_filter_data(algo):
     return jsonify({})
 
 
+@app.route("/related", methods=["GET"], strict_slashes=False)
+def get_related_data():
+    if len(request.args) != 0:
+        topic = request.args.get('topic')
+        if topic:
+            return jsonify({
+                "collabf": get("collabf", topic),
+                "cosine": get("cosine", topic)
+            })
+
+
 if __name__ == '__main__':
     if not app.debug:
         import logging
         from logging.handlers import RotatingFileHandler
+
         file_handler = RotatingFileHandler(filename="app_debug.log")
         file_handler.setLevel(logging.ERROR)
         app.logger.addHandler(file_handler)
