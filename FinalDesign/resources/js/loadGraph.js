@@ -28,16 +28,18 @@
 
         particleSystem.eachNode(function(node, pt){          
           var w = 10 //+ Math.random() * 30
-          ctx.fillStyle = (node.data.type == 'R') ? "grey" : (node.data.type == 'C') ? "#F7B32B" : "#8BD854"
+          ctx.fillStyle = (node.data.type == 'R') ? "#333" : (node.data.type == 'C') ? "#F7B32B" : "#8BD854"
           //ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
           ctx.beginPath();
           radius = node.data.radius
           ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI, false);              
           ctx.closePath();      
           ctx.fill();     
-          ctx.fillStyle = "black";     
-          ctx.fillText(node.data.name, pt.x-radius/2, pt.y);
-
+          ctx.fillStyle = (node.data.type == 'R') ? "White" : "black";     
+          if(node.data.type == 'R') 
+            ctx.fillText(node.data.name, pt.x, pt.y);          
+          else
+            ctx.fillText(node.data.name, pt.x-(radius/2) - 12, pt.y);
         })    			
       },
       
@@ -108,18 +110,26 @@
     sys.graft({
        nodes:{
         a: {radius: 45, type: 'R', name: 'R'},
-        b: {radius: 25, type: 'C', name: 'Linear Regression'},
-        c: {radius: 35, type: 'S', name: 'time series'},
-        d: {radius: 20, type: 'S', name: 'R Studio'},
+        b: {radius: 25, type: 'C', name: 'Anova'},
+        c: {radius: 35, type: 'S', name: 'Time-Series'},
+        d: {radius: 25, type: 'S', name: 'Big Data'},
         e: {radius: 40, type: 'C', name: 'Statistics'},
-        f: {radius: 40, type: 'C', name: 'Anova'},
+        f: {radius: 40, type: 'C', name: 'Regression'},
+        g: {radius: 50, type: 'S', name: 'Mixed-Model'},
+        h: {radius: 35, type: 'S', name: 'lme4-nlme'},
+        i: {radius: 50, type: 'C', name: 'Logistic'},
+        j: {radius: 45, type: 'C', name: 'Machine-Learning'},
       }, 
       edges:{
         a:{ b:{weight: 1},
             c:{weight: 3},
             d:{weight: 2},
             e:{weight: 2},
-            f:{weight: 4},
+            f:{weight: 4},            
+            g:{weight: 4},
+            h:{weight: 5},
+            i:{weight: 5},
+            j:{weight: 6},            
           }
         }
      })
