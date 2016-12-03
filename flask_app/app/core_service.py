@@ -9,6 +9,7 @@ DB = 'dvproject'
 PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
+TOPICS = 'dbtopics0'
 
 # Flask INIT
 app = Flask(__name__)
@@ -37,6 +38,11 @@ def get(algo, topic, list_topics=False):
     return {"topic": topic,
             "related_topics": related_topics[0]}
 
+def get_topics():
+    db_collection = conn[DB][TOPICS]
+    cursor = db_collection.find()
+    topics = [topic.get("name") for topic in cursor]
+    return {"topics": topics}
 
 @app.route("/", strict_slashes=False)
 def home():
@@ -50,7 +56,12 @@ def heartbeat():
     })
 
 
-@app.route("/<algo>", methods=["GET"])
+@app.route("/topicslist", methods=["GET"], strict_slashes=False)
+def list_topics():
+    return jsonify(get_topics())
+
+
+@app.route("/<algo>", methods=["GET"], strict_slashes=False)
 def get_filter_data(algo):
     if len(request.args) != 0:
 
