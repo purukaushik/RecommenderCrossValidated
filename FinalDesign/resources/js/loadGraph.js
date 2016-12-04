@@ -1,4 +1,4 @@
-(function($){
+//(function($){
 
   var Renderer = function(canvas){
     var canvas = $(canvas).get(0)
@@ -36,10 +36,7 @@
           ctx.closePath();      
           ctx.fill();     
           ctx.fillStyle = (node.data.type == 'R') ? "White" : "black";     
-          if(node.data.type == 'R') 
-            ctx.fillText(node.data.name, pt.x, pt.y);          
-          else
-            ctx.fillText(node.data.name, pt.x-(radius/2) - 12, pt.y);
+          ctx.fillText(node.data.name, pt.x-(3*radius/4), pt.y);
         })    			
       },
       
@@ -54,8 +51,7 @@
 
             var pos = $(canvas).offset();
             _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            dragged = particleSystem.nearest(_mouseP);
-            alert(dragged.node.data.name);
+            dragged = particleSystem.nearest(_mouseP);            
             
             if (dragged && dragged.node !== null){
                dragged.node.fixed = true
@@ -75,7 +71,9 @@
             }
             return false
           },
-
+          hovered:function(e){
+            debugger;
+          },
           dropped:function(e){
             if (dragged===null || dragged.node===undefined) return
             if (dragged.node !== null) dragged.node.fixed = false
@@ -86,54 +84,22 @@
             _mouseP = null
             return false
           }
-        }
-        
-        $(canvas).mousedown(handler.clicked);
 
+        }
+                
+        canvas.addEventListener("mousedown", handler.clicked); 
+        canvas.addEventListener("onmouseover", handler.hovered); 
       },
       
     }
     return that
   }    
 
-  $(document).ready(function(){
-    var sys = arbor.ParticleSystem(1000, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
-    sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
-    sys.renderer = Renderer("#graph") // our newly created renderer will have its .init() method called shortly by sys...
-/*
-    sys.addEdge('a','b')
-    sys.addEdge('a','c')
-    sys.addEdge('a','d')
-    sys.addEdge('a','e')
-    sys.addEdge('a','f')
-*/
-    sys.graft({
-       nodes:{
-        a: {radius: 45, type: 'R', name: 'R'},
-        b: {radius: 25, type: 'C', name: 'Anova'},
-        c: {radius: 35, type: 'S', name: 'Time-Series'},
-        d: {radius: 25, type: 'S', name: 'Big Data'},
-        e: {radius: 40, type: 'C', name: 'Statistics'},
-        f: {radius: 40, type: 'C', name: 'Regression'},
-        g: {radius: 50, type: 'S', name: 'Mixed-Model'},
-        h: {radius: 35, type: 'S', name: 'lme4-nlme'},
-        i: {radius: 50, type: 'C', name: 'Logistic'},
-        j: {radius: 45, type: 'C', name: 'Machine-Learning'},
-      }, 
-      edges:{
-        a:{ b:{weight: 1},
-            c:{weight: 3},
-            d:{weight: 2},
-            e:{weight: 2},
-            f:{weight: 4},            
-            g:{weight: 4},
-            h:{weight: 5},
-            i:{weight: 5},
-            j:{weight: 6},            
-          }
-        }
-     })
+  function loadGraph(graph){
+    var sys = arbor.ParticleSystem(1000, 600, 0.5) 
+    sys.parameters({gravity:true}) 
+    sys.renderer = Renderer("#graph") 
+    sys.graft(graph)    
+  }
 
-  })
 
-})(this.jQuery)

@@ -66,7 +66,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" id="contentPane">
+                <h1></h1>
             	<canvas id="graph" width="660" height="600"></canvas>
             </div>
             <div class="col-md-3" id="recommendations">            
@@ -109,28 +110,48 @@
             }).done(function(responseData) {                
                 var availableTags = responseData.topics
                 $("#searchText").autocomplete({
-                    source: availableTags,
+                    source: function(request, response) {
+                            var results = $.ui.autocomplete.filter(availableTags, request.term);
+                            response(results.slice(0, 10));
+                        },
                     select: function( event, ui ) {
-                        loadRecommendations(ui.item.value);
+                        //loadRecommendations(ui.item.value);
+                        loadRecommendations("likert");                        
                     }
                 });
-            });
+            });            
 
-            function loadRecommendations() {
-                $.ajax({
-                    url: baseURL + "/" + ext, 
-                    jsonp: true
-                }).done(function(responseData) {                
-                    var availableTags = responseData.topics
-                    $("#searchText").autocomplete({
-                        source: availableTags,
-                        select: function( event, ui ) {
-                            loadRecommendations(ui.item.value);
-                        }
-                    });
-                });
-            }
 		});
+
+        function loadRecommendations(topic) {
+            $("#contentPane h1").text(topic.replace("-", " "));            
+            $.ajax({
+                url: baseURL + "/collabf?topic="+topic, 
+                jsonp: true
+            }).done(function(responseData) {                
+                topics = responseData.related_topics;
+                topics.sort(function(a,b) {return (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0);} );
+                topics = topics.filter(function(element) { return element.name != topic && element.value > 0});
+                if(topics.length > 10) {
+                    topics = topics.slice(0, 20);   
+                }
+                var graph = {}
+                var nodes = { 1: {radius: 50, type: 'R', name: topic, fixed: true}}
+                var rootEdges = {}
+                for(i=0; i<topics.length; i++) {
+                    nodes[i+2] = {radius: 50, type: 'C', name: topics[i].name}
+                    rootEdges[i+2] = {weight: (10 - i/2)}
+                }
+                graph["nodes"] = nodes
+                graph["edges"] = {}
+                graph["edges"][1] = rootEdges
+                if($("div#contentPane #graph")) {
+                    $("div#contentPane #graph").remove()
+                    $("div#contentPane").append("<canvas id='graph' width='660' height='600'></canvas>")
+                }
+                loadGraph(graph)
+            });
+        }
 
     </script>
 </body>
