@@ -157,16 +157,19 @@ def get_description_():
 def question_list(topic, question_order):
     db_collection = conn[DB][AGGREGATE]
     cursor = db_collection.find({"Topic": topic})
-    if question_order == 1:
-        return  cursor.get("Score_Question_list")
-    elif question_order == 2:
-        return cursor.get("View_Question_list")
-    elif question_order == 3:
-        return cursor.get("Recent_Question_list")
-    elif question_order == 4:
-        return cursor.get("Bounty_Question_list")
-    elif question_order == 5:
-        return cursor.get("Most_Answer_Question_list")
+    if cursor.count():
+        if question_order == 1:
+            return  cursor[0].get("Score_Question_list")
+        elif question_order == 2:
+            return cursor[0].get("View_Question_list")
+        elif question_order == 3:
+            return cursor[0].get("Recent_Question_list")
+        elif question_order == 4:
+            return cursor[0].get("Bounty_Question_list")
+        elif question_order == 5:
+            return cursor[0].get("Most_Answer_Question_list")
+        else:
+            return [{"Question": "Error - Option not found."}]
     else:
         return [{"Question": "Error - Option not found."}]
 
@@ -181,11 +184,16 @@ def get_question_list():
                 if question_order:
                     return jsonify({
                         "topic": topic,
-                        "question": question_list(topic, question_order)
+                        "question": question_list(topic, int(question_order))
                     })
-        except:
+                else:
+                    return jsonify({"Error" : "No question_order"})
+            else:
+                return jsonify({"Error:":"No topic"})
+        except Exception as e:
+            print e.message
             print 'Error has occured when fetching the list of questions'
-
+    return jsonify({})
 
 
 
