@@ -28,14 +28,22 @@
 
         particleSystem.eachNode(function(node, pt){          
           var w = 10 //+ Math.random() * 30
-          ctx.fillStyle = (node.data.type == 'R') ? "#333" : (node.data.type == 'C') ? "#F7B32B" : "#8BD854"
-          //ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
+          var color = '', font = "black";
+          switch (node.data.type) {            
+            //case 'C': color = "#FF6B6D"; break;
+            case 'C': color = "#FF5252"; break;
+            case 'S': color = "#74C8FF"; break;
+            case 'B': color = "#A27AFF"; break;
+            default: color = "#333"; font = "White"; break;
+          }
+          
+          ctx.fillStyle = color;
           ctx.beginPath();
           radius = node.data.radius
           ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI, false);              
           ctx.closePath();      
           ctx.fill();     
-          ctx.fillStyle = (node.data.type == 'R') ? "White" : "black";     
+          ctx.fillStyle = font;     
           ctx.fillText(node.data.name, pt.x-(3*radius/4), pt.y);
         })    			
       },
@@ -72,7 +80,10 @@
             return false
           },
           hovered:function(e){
-            debugger;
+            var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            dragged = particleSystem.nearest(_mouseP);   
+            loadDescription(dragged.node.data.name, true);                        
           },
           dropped:function(e){
             if (dragged===null || dragged.node===undefined) return
@@ -88,7 +99,7 @@
         }
                 
         canvas.addEventListener("mousedown", handler.clicked); 
-        canvas.addEventListener("onmouseover", handler.hovered); 
+        canvas.addEventListener("mousemove", handler.hovered); 
       },
       
     }

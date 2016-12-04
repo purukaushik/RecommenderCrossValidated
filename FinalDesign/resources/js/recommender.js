@@ -1,61 +1,84 @@
-function makeRecommendation(nodeArray) {
-	var selectedTopic = nodeArray[nodeArray.length-1].name;
-	document.getElementById("questionRecommendationHeading").innerHTML = "Top Recommendation for "  + selectedTopic.toUpperCase() + ":";	
-	document.getElementById("activityHeading").innerHTML = "Activity in "  + selectedTopic.toUpperCase() + ":";	
-	var content = "<div class='recommendation-bg'> <a herf='#'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</a> </div>";
-	var count = Math.ceil(Math.random()*5);
-	var htmlContent = '';
-	for(i=0; i<count; i++) {
-		htmlContent +=  content;
-	}
-	document.getElementById("questionRecommendations").innerHTML = htmlContent;
-	document.getElementById("moreCharts").style.display = "block";
-	loadLineGraph();
+var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
+$(document).ready(function(){
+    $('input[type="range"]').rangeslider({
+        polyfill: false,
+        onInit: function() {},
+        onSlide: function(position, value) {},
+        onSlideEnd: function(position, value) {}
+    });            
+                   
+    $.ajax({
+        url: baseURL + "/topicslist", 
+        jsonp: true
+    }).done(function(responseData) {                
+        var availableTags = responseData.topics
+        $("#searchText").autocomplete({
+            source: function(request, response) {
+                    var results = $.ui.autocomplete.filter(availableTags, request.term);
+                    response(results.slice(0, 10));
+                },
+            select: function( event, ui ) {
+                //loadRecommendations(ui.item.value);
+                loadRecommendations("likert");                        
+            }
+        });
+    });            
+
+});
+
+function loadRecommendations(topic) {
+    $("#contentPane h1").text(camelize(topic.replace("-", " ")));
+    var view = $("#averageViewInput").val(),
+    rating = $("#averageRatingInput").val(),
+    support = $("#supportInput").val(),
+    recommendationCount = $("#recommendationCountInput").val(),
+    contentCount = $("#recommendationTypeCountInput").val(),
+    collabCount = recommendationCount - contentCount;
+    $.ajax({
+        //url: baseURL + "/recommendations?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&contentCount="+contentCount, 
+        url: baseURL + "/collabf?topic="+topic, 
+        jsonp: true
+    }).done(function(responseData) {                
+        topics = responseData.related_topics;
+        topics.sort(function(a,b) {return (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0);} );
+        topics = topics.filter(function(element) { return element.name != topic && element.value > 0});
+        if(topics.length > 10) {
+            topics = topics.slice(0, 20);   
+        }
+        var graph = {}
+        var nodes = { 1: {radius: 50, type: 'R', name: topic, fixed: true}}
+        var rootEdges = {}
+        for(i=0; i<topics.length; i++) {
+            nodes[i+2] = {radius: 50, type: 'C', name: topics[i].name}
+            rootEdges[i+2] = {weight: (10 - i/2)}
+        }
+        graph["nodes"] = nodes
+        graph["edges"] = {}
+        graph["edges"][1] = rootEdges
+        if($("div#contentPane #graph")) {
+            $("div#contentPane #graph").remove()
+            $("div#contentPane").append("<canvas id='graph' width='660' height='600'></canvas>")
+        }
+        loadGraph(graph)
+    });
+}
+function loadDescription(topic, addTopicToHeading){
+    $("#descriptionHeading").html("Description - " + camelize(topic));
+    /*
+    $.ajax({
+        url: baseURL + "/description?topic="+topic, 
+        jsonp: true
+    }).done(function(responseData) {                
+        var desc = "Description" + (addTopicToHeading ?  "- " + camelize(topic) : "");
+        $("#descriptionHeading").html(desc);            
+        $("#description").html(responseData.description);
+    }); 
+    */
 }
 
-function loadLineGraph() {
-	var m = [80, 80, 80, 80]; // margins
-    var w = 500 - m[1] - m[3]; // width
-    var h = 400 - m[0] - m[2]; // height
-    
-    var data = [];
-   	for(i=0; i<7; i++) {
-   		data.push(Math.ceil(Math.random()*12))
-   	}
-
-    var x = d3.scale.linear().domain([new Date(2010, 0, 1, 0), new Date(2016, 0, 1, 0)]).range([0, w]),
-    tick = x.ticks(d3.timeYear),
-    y = d3.scale.linear().domain([0, 12]).range([h, 0]),
-    line = d3.svg.line()
-      .x(function(d,i) {         
-        return x(i) + 10; 
-      })
-      .y(function(d) { 
-        return y(d); 
-      })
-
-    tick.map(x.tickFormat("%Y"))
-
-    document.getElementById("lineGraph").innerHTML = "";
-
-    var graph = d3.select("#lineGraph").append("svg:svg")
-        .attr("width", w + m[1] + m[3])
-        .attr("height", h + m[0] + m[2])
-        .append("svg:g")
-        .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-
-    var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(false);
-    graph.append("svg:g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + h + ")")
-        .call(xAxis);
-
-
-    var yAxisLeft = d3.svg.axis().scale(y).ticks(4).orient("left");
-    graph.append("svg:g")
-            .attr("class", "y axis")
-            .attr("transform", "translate(-25,0)")
-            .call(yAxisLeft);
-      
-    graph.append("svg:path").attr("d", line(data));
+function camelize(str) {
+    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+        if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
+        return index == 0 ? match.toLowerCase() : match.toUpperCase();
+    });
 }

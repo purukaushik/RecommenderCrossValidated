@@ -41,6 +41,12 @@ def get(algo, topic, list_topics=False):
     return related_topics[0]
 
 
+def getDescription(topic):    
+    cursor = conn[DB][TOPICS].find({"name": topic}, {"description": 1})
+    description = cursor[0].get("description")
+    return description
+
+
 def get_topics():
     db_collection = conn[DB][TOPICS]
     cursor = db_collection.find()
@@ -130,6 +136,7 @@ def get_related_data():
             })
 
 
+
 @app.route("/recommendation", methods=["GET"], strict_slashes=False)
 def get_recommendation_data():
     if len(request.args):
@@ -140,6 +147,16 @@ def get_recommendation_data():
         support = request.args.get('support')
         topic = request.args.get('topic')
         return jsonify(filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support))
+
+@app.route("/description", methods=["GET"], strict_slashes=False)
+def get_related_data():
+    if len(request.args) != 0:
+        topic = request.args.get('topic')
+        if topic:
+            return jsonify({
+                "description": getDescription(topic)
+            })
+
 
 
 if __name__ == '__main__':

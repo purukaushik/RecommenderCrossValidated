@@ -74,19 +74,42 @@ input[type="range"]:focus + .rangeslider .rangeslider__handle {
   box-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
 }
 
+.rangeslider__fill {
+  background: #e6e6e6;
+}
 
-#averageRating .rangeslider__fill {
+#averageRating .rangeslider {
   background: #B9BAA3;
 }
 
-#averageView .rangeslider__fill {
-  background: #FF6B6D;
-}
-
-#social .rangeslider__fill {
+#averageView .rangeslider {  
   background: #F7B32B;
 }
 
-#contextual .rangeslider__fill {
-  background: #8BD854;
+#support .rangeslider {  
+  background: #946CCB;
+}
+
+#recommendation-count .rangeslider__fill {  
+  background: #63CBA1;
+}
+
+#recommender-type .rangeslider__fill {
+  background: #FF5252;
+}
+#recommender-type .rangeslider {
+  background: #74C8FF 
+}
+h3.sub-heading{
+  font-size: 15px;
+  padding: 0px;
+  display: inline-block;  
+  margin: 5px 0px;
+  font-weight: 200;
+}
+.width-half {
+  width: 49%;
+}
+.width-third {
+  width: 32%;
 }
