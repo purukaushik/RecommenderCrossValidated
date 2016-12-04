@@ -4,8 +4,8 @@ $(document).ready(function(){
     $('input[type="range"]').rangeslider({
         polyfill: false,
         onInit: function() {},
-        onSlide: function(position, value) {},
-        onSlideEnd: function(position, value) {}
+        onSlide: function(position, value) { },
+        onSlideEnd: function(position, value) { loadRecommendations(localStorage.getItem("topic")); }
     });            
                    
     $.ajax({
@@ -44,7 +44,8 @@ function loadRecommendations(topic) {
     support = $("#supportInput").val(),
     recommendationCount = $("#recommendationCountInput").val(),
     contentCount = $("#recommendationTypeCountInput").val(),
-    collabCount = recommendationCount - contentCount;    
+    collabCount = recommendationCount - contentCount;  
+    localStorage.setItem("topic", topic);  
     $.ajax({
         //url: baseURL + "/recommendations?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&contentCount="+contentCount, 
         url: baseURL + "/collabf?topic="+topic, 

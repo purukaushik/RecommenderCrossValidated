@@ -65,28 +65,45 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
     cursor = conn[DB][COLLAB_FILTER].find({"name": topic}, {"related_topics": 1})
     collabvalues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
 
-    # .. ii. For each apply averageViews filter ->
-    # ....a. obtain %le from other table,
-    cursor = conn[DB][PERCENTILES].find({"name": topic})
-    minViewPerc, maxViewPerc = map(int, cursor[0].get(averageViews).split("-"))
-    minUpVotePerc, maxUpVotePerc = map(int, cursor[0].get(averageUpvote).split("-"))
-    minSupportPerc, maxSupportPerc = map(int, cursor[0].get(support).split("-"))
+    cursor = conn[DB][COSINE_SIM].find({"name": topic}, {"related_topics": 1})
+    cosineValues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
+
+    collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues, support, collabCount)
+    cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues, support, cosineCount)
+
+    return {"collab": collabvalues, "cosine": cosineValues}
 
 
-    # ....b. get values for this topic
-    cursor = conn[DB][AGGREGATE].find({"name": topic})
-    avgViewCount = cursor[0].get("Avg_View_count")
-    averageUpvoteCount = cursor[0].get("Avg_Question_score")
-    supportCount = cursor[0].get("Support_Percentile")
+def filterByFilter(averageUpvote, averageViews, collabvalues, support, count):
+    AVP__ = unicode(MAPPING.get(int(averageViews)))
+    QSP__ = unicode(MAPPING.get(int(averageUpvote)))
+    SSP__ = unicode(MAPPING.get(int(support)))
 
-    # ....c. check %le with averageViews
+    avLow, avHigh = map(float, avp[0].get(AVP__).split("-"))
+    avuLow, avuHigh = map(float, qsp[0].get(QSP__).split("-"))
+    sspLow, sspHigh = map(float, ssp[0].get(SSP__).split("-"))
 
-    # ....d. filter if averageViews in curr topic %le
-    # ...iii. Do the same for averageUpvote
+    def genFilterFn(relTopic, quirk, low, high):
+        cursor = conn[DB][AGGREGATE].find({"Topic": relTopic})
+        k__ = cursor[0].get(quirk)
+        return low <= k__ and k__ <= high
 
-    # 2. COSINE -> do same steps as above
+    scoreFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_Question_score", avuLow, avuHigh), collabvalues)
+    viewFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_View_count", avLow, avHigh), collabvalues)
+    supportFilter = filter(lambda x: genFilterFn(x.get("name"), "Support_Percentile", sspLow, sspHigh), collabvalues)
+    resultValues = List(set(scoreFilter) & set(viewFilter) & set(supportFilter))
 
-    return {}
+    def commonElementsNotAlreadyIncluded(resultList, list1, list2=None):
+        if list2:
+            return List((set(list1) & set(list2)) - set(resultList))
+        else:
+            return List(set(list1) - set(resultList))
+
+    if resultValues.length < count:
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, scoreFilter)
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, supportFilter)
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, supportFilter, scoreFilter)
+    return resultValues
 
 
 @app.route("/", strict_slashes=False)
