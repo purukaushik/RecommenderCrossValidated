@@ -10,7 +10,7 @@ DB = 'dvproject'
 PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
-TOPICS = 'dbtopics0'
+TOPICS = 'dbtopics1'
 PERCENTILES = ''
 AGGREGATE = 'dbaggregate0'
 # Flask INIT
@@ -42,8 +42,8 @@ def get(algo, topic, list_topics=False):
 
 
 def getDescription(topic):    
-    cursor = conn[DB][TOPICS].find({"name": topic}, {"description": 1})
-    description = cursor[0].get("description")
+    cursor = conn[DB][TOPICS].find({"name": unicode(topic)}, {"desc": 1})
+    description = str(cursor[0].get("desc"))
     return description
 
 
@@ -148,8 +148,9 @@ def get_recommendation_data():
         topic = request.args.get('topic')
         return jsonify(filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support))
 
+
 @app.route("/description", methods=["GET"], strict_slashes=False)
-def get_related_data():
+def get_description_():
     if len(request.args) != 0:
         topic = request.args.get('topic')
         if topic:
