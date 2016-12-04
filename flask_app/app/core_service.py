@@ -11,6 +11,8 @@ PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
 TOPICS = 'dbtopics0'
+AGGREGATE = 'dbaggregate0'
+METADATA = 'dbmetadata0'
 
 # Flask INIT
 app = Flask(__name__)
@@ -103,6 +105,40 @@ def get_related_data():
             return jsonify({
                 "description": getDescription(topic)
             })
+
+
+def question_list(topic, question_order):
+    db_collection = conn[DB][AGGREGATE]
+    cursor = db_collection.find({"Topic": topic})
+    if question_order == 1:
+        return  cursor.get("Score_Question_list")
+    elif question_order == 2:
+        return cursor.get("View_Question_list")
+    elif question_order == 3:
+        return cursor.get("Recent_Question_list")
+    elif question_order == 4:
+        return cursor.get("Bounty_Question_list")
+    elif question_order == 5:
+        return cursor.get("Most_Answer_Question_list")
+    else:
+        return [{"Question": "Error - Option not found."}]
+
+
+@app.route("/recommendedQuestion", methods=["GET"], strict_slashes=False)
+def get_question_list():
+    if len(request.args) != 0:
+        try:
+            topic = request.args.get('topic')
+            if topic:
+                question_order = request.args.get('sortOrder')
+                if question_order:
+                    return jsonify({
+                        "topic": topic,
+                        "question": question_list(topic, question_order)
+                    })
+        except:
+            print 'Error has occured when fetching the list of questions'
+
 
 
 if __name__ == '__main__':
