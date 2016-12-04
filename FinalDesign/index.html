@@ -41,29 +41,49 @@
         <div class="row">
             <div class="col-md-3" id="sideboard">
             	<h1>Filters</h1>
-            	<div>
+            	<div id="averageRating">
             		<h1>Average Upvote to questions</h1>
-            		<div id="averageRating">
-            			<input type="range" min="10"max="100" step="10" value="30" >
+            		<div>
+            			<input type="range" min="1" max="3" step="1" value="2" id="averageRatingInput" >
             		</div>
+                    <h3 class="sub-heading width-third text-left">Low</h3>
+                    <h3 class="sub-heading width-third text-center">Medium</h3>
+                    <h3 class="sub-heading width-third text-right">High</h3>
             	</div>            	
             	<div id="averageView">
             		<h1>Average views</h1>
             		<div>
-            			<input type="range" min="10"max="100" step="10" value="30" >
+            			<input type="range" min="1" max="3" step="1" value="2" id="averageViewInput" >
             		</div>
+                    <h3 class="sub-heading width-third text-left">Low</h3>
+                    <h3 class="sub-heading width-third text-center">Medium</h3>
+                    <h3 class="sub-heading width-third text-right">High</h3>
             	</div>
-                <div>
-                    <h1># Recommendations based on user interest</h1>
-                    <div id="social">
-                        <input type="range" min="1"max="10" step="1" value="5" >
-                    </div>
-                </div>              
-                <div id="contextual">
-                    <h1># Recommendations based on content similarity</h1>
+                <div id="support">
+                    <h1>Support from Community</h1>
                     <div>
-                        <input type="range" min="1"max="10" step="1" value="5" >
+                        <input type="range" min="1" max="3" step="1" value="2" id="supportInput">
                     </div>
+                    <h3 class="sub-heading width-third text-left">Low</h3>
+                    <h3 class="sub-heading width-third text-center">Medium</h3>
+                    <h3 class="sub-heading width-third text-right">High</h3>
+                </div>
+                <div id="recommendation-count">
+                    <h1># of Recommendations</h1>
+                    <div>
+                        <input type="range" min="1"max="20" step="1" value="10" id="recommendationCountInput">
+                    </div>
+                    <h3 class="sub-heading width-half text-left">1</h3>
+                    <h3 class="sub-heading width-half text-right">20</h3>
+                </div>              
+                
+                <div id="recommender-type">                    
+                    <h1>Recommendation Preference</h1>
+                    <div>
+                        <input type="range" min="1"max="10" step="1" value="5"  id="recommendationTypeCountInput">
+                    </div>
+                    <h3 class="sub-heading text-left width-half">Content Similarity</h3>
+                    <h3 class="sub-heading text-right width-half">User Interest</h3>
                 </div>
             </div>
             <div class="col-md-6" id="contentPane">
@@ -71,7 +91,7 @@
             	<canvas id="graph" width="660" height="600"></canvas>
             </div>
             <div class="col-md-3" id="recommendations">            
-                <h1>Description</h1>
+                <h1 id="descriptionHeading">Description</h1>
                 <div id="description">
                     R is a programming language and software environment for statistical computing and graphics supported by the R Foundation for Statistical Computing. The R language is widely used among statisticians and data miners for developing statistical software and data analysis.
                 </div>
@@ -94,65 +114,6 @@
     <script type="text/javascript" src="resources/js/arbor.js"></script>    
     <script type="text/javascript" src="resources/js/loadGraph.js"></script>    
     <script type="text/javascript" src="resources/js/jquery-ui.min.js"></script>    
-    <script type="text/javascript">
-        var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
-        $(document).ready(function(){
-	    	$('input[type="range"]').rangeslider({
-                polyfill: false,
-                onInit: function() {},
-                onSlide: function(position, value) {},
-                onSlideEnd: function(position, value) {}
-            });            
-                           
-            $.ajax({
-                url: baseURL + "/topicslist", 
-                jsonp: true
-            }).done(function(responseData) {                
-                var availableTags = responseData.topics
-                $("#searchText").autocomplete({
-                    source: function(request, response) {
-                            var results = $.ui.autocomplete.filter(availableTags, request.term);
-                            response(results.slice(0, 10));
-                        },
-                    select: function( event, ui ) {
-                        //loadRecommendations(ui.item.value);
-                        loadRecommendations("likert");                        
-                    }
-                });
-            });            
-
-		});
-
-        function loadRecommendations(topic) {
-            $("#contentPane h1").text(topic.replace("-", " "));            
-            $.ajax({
-                url: baseURL + "/collabf?topic="+topic, 
-                jsonp: true
-            }).done(function(responseData) {                
-                topics = responseData.related_topics;
-                topics.sort(function(a,b) {return (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0);} );
-                topics = topics.filter(function(element) { return element.name != topic && element.value > 0});
-                if(topics.length > 10) {
-                    topics = topics.slice(0, 20);   
-                }
-                var graph = {}
-                var nodes = { 1: {radius: 50, type: 'R', name: topic, fixed: true}}
-                var rootEdges = {}
-                for(i=0; i<topics.length; i++) {
-                    nodes[i+2] = {radius: 50, type: 'C', name: topics[i].name}
-                    rootEdges[i+2] = {weight: (10 - i/2)}
-                }
-                graph["nodes"] = nodes
-                graph["edges"] = {}
-                graph["edges"][1] = rootEdges
-                if($("div#contentPane #graph")) {
-                    $("div#contentPane #graph").remove()
-                    $("div#contentPane").append("<canvas id='graph' width='660' height='600'></canvas>")
-                }
-                loadGraph(graph)
-            });
-        }
-
-    </script>
+    <script type="text/javascript" src="resources/js/recommender.js"></script>
 </body>
 </html>
