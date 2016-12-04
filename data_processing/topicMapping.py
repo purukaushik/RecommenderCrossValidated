@@ -5,6 +5,7 @@ from gensim import corpora
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from pymongo import MongoClient
+import sys
 
 MONGODB_HOST = 'ec2-52-43-158-164.us-west-2.compute.amazonaws.com'
 MONGODB_PORT = 27017
@@ -45,12 +46,17 @@ dictionary = corpora.Dictionary(terms)
 lda = gensim.models.ldamodel.LdaModel
 
 missedCount = 0
-questionSet = db[QUESTIONS].find()
+argv = sys.argv
+if len(argv) !=3:
+    print "Not enough args in call"
+    exit()
+
+low,high = argv[1], argv[2]
+questionSet = db[QUESTIONS].find({}).sort("Question_id", 1)[int(low):int(high)]
 count = 0
 db[POSTS].drop()
-posts = []
+
 for question in questionSet:
-    # print question["Question_id"]
     answers = []
     answerObjectList = []
     if question.get("Answer_count") > 0:
@@ -85,12 +91,12 @@ for question in questionSet:
         post["answers"] = answerObjectList
         post["topics"] = [{"name": topic[1], "weight": topic[0]} for topic in termsWeightedList[0:3]]
         print "writing to db..."
-        posts.append(post)
+        db[POSTS].insert(post)
         print "done writing record " + str(count)
         count += 1
     else:
         print "Missed! :("
         missedCount += 1
-db[POSTS].insert(posts)
+
 # print "Total Count " + questionSet
 print "Missed Count " + str(missedCount)
