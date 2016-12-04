@@ -1,4 +1,5 @@
 from flask import Flask, request, Response, jsonify
+from itertools import groupby    
 from flask_cors import CORS
 from pymongo import MongoClient
 
@@ -78,13 +79,14 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
     # 1. COLLAB
     # .. i. Get the collab topics from DB with metric, sort them by value
     cursor = conn[DB][COLLAB_FILTER].find({"name": topic}, {"related_topics": 1})
-    collabvalues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
-
+    collabvalues = sorted(cursor[0].get('related_topics'),key=lambda x: x.get('value'), reverse=True)
+    collabvalues = map(lambda x: (x.get('name'), x.get('value')), collabvalues)
+    
     cursor = conn[DB][COSINE_SIM].find({"name": topic}, {"related_topics": 1})
     cosineValues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
-
-    collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues, support)
-    cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues, support)
+    cosineValues = map(lambda x: (x.get('name'), x.get('value')), cosineValues)     
+    collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues,support,collabCount)
+    cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues,support, cosineCount)
 
     return {"collab": collabvalues, "cosine": cosineValues}
 
@@ -103,22 +105,30 @@ def filterByFilter(averageUpvote, averageViews, collabvalues, support, count):
         k__ = cursor[0].get(quirk)
         return low <= k__ and k__ <= high
 
-    scoreFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_Question_score", avuLow, avuHigh), collabvalues)
-    viewFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_View_count", avLow, avHigh), collabvalues)
-    supportFilter = filter(lambda x: genFilterFn(x.get("name"), "Support_Percentile", sspLow, sspHigh), collabvalues)
-    resultValues = List(set(scoreFilter) & set(viewFilter) & set(supportFilter))
+    scoreFilter = filter(lambda x: genFilterFn(x[0], "Avg_Question_score", avuLow, avuHigh), collabvalues)
+    viewFilter = filter(lambda x: genFilterFn(x[0], "Avg_View_count", avLow, avHigh), collabvalues)
+    supportFilter = filter(lambda x: genFilterFn(x[0], "Support_Percentile", sspLow, sspHigh), collabvalues)
+    resultValues = map(lambda x: (x[0],x[1],3), list(set(scoreFilter) & set(viewFilter) &
+        set(supportFilter)))
 
+    def mapIt(l,v):
+        return map(lambda x:(x[0],x[1],v), l)
     def commonElementsNotAlreadyIncluded(resultList, list1, list2=None):
         if list2:
-            return List((set(list1) & set(list2)) - set(resultList))
+            return mapIt(list((set(list1) & set(list2)) - set(resultList)),2)
         else:
-            return List(set(list1) - set(resultList))
+            return mapIt(list(set(list1) - set(resultList)),1)
 
-    if resultValues.length < count:
+    if len(resultValues) < count:
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, scoreFilter)
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, supportFilter)
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, supportFilter, scoreFilter)
-    return resultValues
+    print resultValues
+    for i,v in groupby(resultValues,lambda y: y[0]):
+        print max(list(v), key=lambda x: x[2])
+
+    return map(lambda x: max(list(x[1]), key=lambda z:z[2]),
+            groupby(resultValues, lambda y: y[0]))
 
 
 @app.route("/", strict_slashes=False)
