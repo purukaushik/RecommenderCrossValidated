@@ -43,8 +43,10 @@
           ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI, false);              
           ctx.closePath();      
           ctx.fill();     
+          ctx.textAlign="center"; 
+          ctx.font="17px Helvetica"
           ctx.fillStyle = font;     
-          ctx.fillText(node.data.name, pt.x-(3*radius/4), pt.y);
+          ctx.fillText(node.data.name, pt.x, pt.y);
         })    			
       },
       
@@ -64,7 +66,7 @@
             if (dragged && dragged.node !== null){
                dragged.node.fixed = true
             }
-
+            loadRecommendations(dragged.node.data.name)
             $(canvas).bind('mousemove', handler.dragged)
             $(window).bind('mouseup', handler.dropped)
             

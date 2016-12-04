@@ -1,5 +1,6 @@
 var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
 $(document).ready(function(){
+    $("#initialSearchText").hide();
     $('input[type="range"]').rangeslider({
         polyfill: false,
         onInit: function() {},
@@ -8,38 +9,48 @@ $(document).ready(function(){
     });            
                    
     $.ajax({
-        url: baseURL + "/topicslist", 
+        url: baseURL + "/topicsList", 
         jsonp: true
     }).done(function(responseData) {                
-        var availableTags = responseData.topics
-        $("#searchText").autocomplete({
+        var availableTags = responseData.topics.map(function(topic) { 
+            return {"label" : topic.replace("-", " "), "value" : topic} 
+        });
+        $("#searchText, #initialSearchText").autocomplete({
             source: function(request, response) {
                     var results = $.ui.autocomplete.filter(availableTags, request.term);
-                    response(results.slice(0, 10));
+                    results = results.slice(0, 10)
+                    if(results.length == 0) {
+                        results.push({label: "Sorry No Match :(", value: ""})
+                    } 
+                    response(results);
                 },
             select: function( event, ui ) {
-                //loadRecommendations(ui.item.value);
-                loadRecommendations("likert");                        
+                if(ui.item.value != "") {
+                    loadRecommendations(ui.item.value); 
+                    $("#myModal").modal('hide')                 
+                }                
             }
-        });
-    });            
-
+        });        
+        $("#loadingGif").hide();
+        $("#initialSearchText").show();
+    });                
+    $("#myModal").modal({show: true, backdrop: 'static', keyboard: false})
 });
 
 function loadRecommendations(topic) {
-    $("#contentPane h1").text(camelize(topic.replace("-", " ")));
+    $("#contentPane h1").text(topic.replace("-", " "));
     var view = $("#averageViewInput").val(),
     rating = $("#averageRatingInput").val(),
     support = $("#supportInput").val(),
     recommendationCount = $("#recommendationCountInput").val(),
     contentCount = $("#recommendationTypeCountInput").val(),
-    collabCount = recommendationCount - contentCount;
+    collabCount = recommendationCount - contentCount;    
     $.ajax({
         //url: baseURL + "/recommendations?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&contentCount="+contentCount, 
         url: baseURL + "/collabf?topic="+topic, 
         jsonp: true
     }).done(function(responseData) {                
-        topics = responseData.related_topics;
+        topics = responseData;
         topics.sort(function(a,b) {return (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0);} );
         topics = topics.filter(function(element) { return element.name != topic && element.value > 0});
         if(topics.length > 10) {
@@ -61,19 +72,21 @@ function loadRecommendations(topic) {
         }
         loadGraph(graph)
     });
+    loadDescription(topic, false)
 }
+var currentTopic;
 function loadDescription(topic, addTopicToHeading){
-    $("#descriptionHeading").html("Description - " + camelize(topic));
-    /*
-    $.ajax({
-        url: baseURL + "/description?topic="+topic, 
-        jsonp: true
-    }).done(function(responseData) {                
-        var desc = "Description" + (addTopicToHeading ?  "- " + camelize(topic) : "");
-        $("#descriptionHeading").html(desc);            
-        $("#description").html(responseData.description);
-    }); 
-    */
+    if(currentTopic != topic) {
+        currentTopic = topic;
+        $.ajax({
+            url: baseURL + "/description?topic="+topic, 
+            jsonp: true
+        }).done(function(responseData) {                
+            var heading = "Description" + (addTopicToHeading ?  "- " + camelize(topic) : "");
+            $("#descriptionHeading").html(heading);            
+            $("#description").html(responseData.description);
+        }); 
+    }    
 }
 
 function camelize(str) {
