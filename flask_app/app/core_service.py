@@ -11,7 +11,8 @@ PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
 TOPICS = 'dbtopics0'
-
+PERCENTILES = ''
+AGGREGATE = 'dbaggregate0'
 # Flask INIT
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -47,6 +48,36 @@ def get_topics():
     return {"topics": topics}
 
 
+def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support):
+    # 1. COLLAB
+    # .. i. Get the collab topics from DB with metric, sort them by value
+    cursor = conn[DB][COLLAB_FILTER].find({"name": topic}, {"related_topics": 1})
+    collabvalues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
+
+    # .. ii. For each apply averageViews filter ->
+    # ....a. obtain %le from other table,
+    cursor = conn[DB][PERCENTILES].find({"name": topic})
+    minViewPerc, maxViewPerc = map(int, cursor[0].get(averageViews).split("-"))
+    minUpVotePerc, maxUpVotePerc = map(int, cursor[0].get(averageUpvote).split("-"))
+    minSupportPerc, maxSupportPerc = map(int, cursor[0].get(support).split("-"))
+
+
+    # ....b. get values for this topic
+    cursor = conn[DB][AGGREGATE].find({"name": topic})
+    avgViewCount = cursor[0].get("Avg_View_count")
+    averageUpvoteCount = cursor[0].get("Avg_Question_score")
+    supportCount = cursor[0].get("Support_Percentile")
+
+    # ....c. check %le with averageViews
+
+    # ....d. filter if averageViews in curr topic %le
+    # ...iii. Do the same for averageUpvote
+
+    # 2. COSINE -> do same steps as above
+
+    return {}
+
+
 @app.route("/", strict_slashes=False)
 def home():
     return Response(response="Not authorized to view this page.", status=200)
@@ -59,11 +90,21 @@ def heartbeat():
     })
 
 
-@app.route("/topicslist", methods=["GET"], strict_slashes=False)
+@app.route("/topicsList", methods=["GET"], strict_slashes=False)
 def list_topics():
     return jsonify(get_topics())
 
 
+# NOT IN USE
+def deprecated(dummy):
+    """
+    Function is deprecated
+    :return:
+    """
+    yield NotImplementedError
+
+
+@deprecated
 @app.route("/<algo>", methods=["GET"], strict_slashes=False)
 def get_filter_data(algo):
     if len(request.args) != 0:
@@ -87,6 +128,18 @@ def get_related_data():
                 "collabf": get("collabf", topic),
                 "cosine": get("cosine", topic)
             })
+
+
+@app.route("/recommendation", methods=["GET"], strict_slashes=False)
+def get_recommendation_data():
+    if len(request.args):
+        collabCount = request.args.get('collabCount')
+        cosineCount = request.args.get('cosineCount')
+        averageViews = request.args.get('view')
+        averageUpvote = request.args.get('upvotes')
+        support = request.args.get('support')
+        topic = request.args.get('topic')
+        return jsonify(filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support))
 
 
 if __name__ == '__main__':
