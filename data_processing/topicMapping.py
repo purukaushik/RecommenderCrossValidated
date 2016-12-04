@@ -54,7 +54,7 @@ if len(argv) !=3:
 low,high = argv[1], argv[2]
 questionSet = db[QUESTIONS].find({}).sort("Question_id", 1)[int(low):int(high)]
 count = 0
-db[POSTS].drop()
+#db[POSTS].drop()
 
 for question in questionSet:
     answers = []
