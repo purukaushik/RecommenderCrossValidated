@@ -10,7 +10,7 @@ DB = 'dvproject'
 PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
-TOPICS = 'dbtopics1'
+TOPICS = 'dbtopics0'
 PERCENTILES = 'dbmetadata0'
 AGGREGATE = 'dbaggregate0'
 # Flask INIT
@@ -84,11 +84,10 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
     collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues, support)
     cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues, support)
 
-    return {"collab" : collabvalues, "cosine" : cosineValues}
+    return {"collab": collabvalues, "cosine": cosineValues}
 
 
 def filterByFilter(averageUpvote, averageViews, collabvalues, support):
-
     AVP__ = unicode(MAPPING.get(int(averageViews)))
     QSP__ = unicode(MAPPING.get(int(averageUpvote)))
     SSP__ = unicode(MAPPING.get(int(support)))
