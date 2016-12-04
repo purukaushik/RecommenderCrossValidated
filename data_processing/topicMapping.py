@@ -14,7 +14,7 @@ db = mongobj.dvproject
 QUESTIONS = "dbquestion"
 ANSWERS = "dbanswer"
 TOPICS = "dbtopics1"
-POSTS = "dbposts1"
+POSTS = "dbposts2"
 
 stop = set(stopwords.words('english'))
 exclude = set(string.punctuation)
@@ -92,13 +92,14 @@ for question in questionSet:
 
         post = question.copy()
         post["answers"] = answerObjectList
-        post["topics"] = [{"name": topic[1], "weight": topic[0]} for topic in termsWeightedList[0:3]]
+        post["topics"] = [{"name": topic[1], "weight": topic[0]} for topic in termsWeightedList[0:5]]
         print "writing to db..."
         db[POSTS].insert(post)
         print "done writing record " + str(count)
         count += 1
     else:
         print "Missed! :("
+        print "Answer count for missed record : " + str(question.get("Answer_count"))
         missedCount += 1
 
 # print "Total Count " + questionSet
