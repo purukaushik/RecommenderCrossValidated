@@ -13,8 +13,7 @@ mongobj = MongoClient(host=MONGODB_HOST, port=MONGODB_PORT)
 db = mongobj.dvproject
 QUESTIONS = "dbquestion"
 ANSWERS = "dbanswer"
-TOPICS = "dbtopics1"
-POSTS = "dbposts"
+TOPICS = "dbtopics00"
 
 blackList = ["Autoregressive\\u2013moving-average model", "Lehmann\\u2013Scheff\xe9 theorem", "ruby", "SAS (software)", "untagged", "error", "Python (programming language)",
 			 "runs" ]
