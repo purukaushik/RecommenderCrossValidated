@@ -43,7 +43,10 @@ def get(algo, topic, list_topics=False):
 
 def getDescription(topic):    
     cursor = conn[DB][TOPICS].find({"name": unicode(topic)}, {"desc": 1})
-    description = str(cursor[0].get("desc"))
+    if cursor.count:
+        description = str(cursor[0].get("desc"))
+    else:
+        description = {}
     return description
 
 
