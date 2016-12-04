@@ -43,7 +43,7 @@ def get(algo, topic, list_topics=False):
 
 def getDescription(topic):    
     cursor = conn[DB][TOPICS].find({"name": unicode(topic)}, {"desc": 1})
-    if cursor.count:
+    if cursor.count():
         description = str(cursor[0].get("desc"))
     else:
         description = {}
@@ -104,16 +104,6 @@ def list_topics():
     return jsonify(get_topics())
 
 
-# NOT IN USE
-def deprecated(dummy):
-    """
-    Function is deprecated
-    :return:
-    """
-    yield NotImplementedError
-
-
-@deprecated
 @app.route("/<algo>", methods=["GET"], strict_slashes=False)
 def get_filter_data(algo):
     if len(request.args) != 0:
