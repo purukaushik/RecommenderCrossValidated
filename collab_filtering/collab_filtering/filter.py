@@ -6,10 +6,10 @@ from pymongo import MongoClient, errors
 from scipy.spatial.distance import cosine
 
 DB = 'dvproject'
-POSTS = 'dbposts0'
+POSTS = 'dbposts1'
 HOST = 'ec2-52-43-158-164.us-west-2.compute.amazonaws.com'
-RELATED_POSTS = 'dbrelposts0'
-COSINE_POSTS = 'dbrelcosineposts0'
+RELATED_POSTS = 'dbrelposts1'
+COSINE_POSTS = 'dbrelcosineposts1'
 
 
 def debug(type_):

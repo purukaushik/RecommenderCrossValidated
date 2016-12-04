@@ -10,6 +10,7 @@ DB = 'dvproject'
 PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
+TOPICS = 'dbtopics1'
 TOPICS = 'dbtopics0'
 AGGREGATE = 'dbaggregate0'
 METADATA = 'dbmetadata0'
@@ -43,8 +44,11 @@ def get(algo, topic, list_topics=False):
 
 
 def getDescription(topic):    
-    cursor = conn[DB][TOPICS].find({"name": topic}, {"description": 1})
-    description = cursor[0].get("description")
+    cursor = conn[DB][TOPICS].find({"name": unicode(topic)}, {"desc": 1})
+    if cursor.count():
+        description = str(cursor[0].get("desc"))
+    else:
+        description = {}
     return description
 
 
@@ -53,6 +57,36 @@ def get_topics():
     cursor = db_collection.find()
     topics = [topic.get("name") for topic in cursor]
     return {"topics": topics}
+
+
+def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support):
+    # 1. COLLAB
+    # .. i. Get the collab topics from DB with metric, sort them by value
+    cursor = conn[DB][COLLAB_FILTER].find({"name": topic}, {"related_topics": 1})
+    collabvalues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
+
+    # .. ii. For each apply averageViews filter ->
+    # ....a. obtain %le from other table,
+    cursor = conn[DB][PERCENTILES].find({"name": topic})
+    minViewPerc, maxViewPerc = map(int, cursor[0].get(averageViews).split("-"))
+    minUpVotePerc, maxUpVotePerc = map(int, cursor[0].get(averageUpvote).split("-"))
+    minSupportPerc, maxSupportPerc = map(int, cursor[0].get(support).split("-"))
+
+
+    # ....b. get values for this topic
+    cursor = conn[DB][AGGREGATE].find({"name": topic})
+    avgViewCount = cursor[0].get("Avg_View_count")
+    averageUpvoteCount = cursor[0].get("Avg_Question_score")
+    supportCount = cursor[0].get("Support_Percentile")
+
+    # ....c. check %le with averageViews
+
+    # ....d. filter if averageViews in curr topic %le
+    # ...iii. Do the same for averageUpvote
+
+    # 2. COSINE -> do same steps as above
+
+    return {}
 
 
 @app.route("/", strict_slashes=False)
@@ -67,7 +101,7 @@ def heartbeat():
     })
 
 
-@app.route("/topicslist", methods=["GET"], strict_slashes=False)
+@app.route("/topicsList", methods=["GET"], strict_slashes=False)
 def list_topics():
     return jsonify(get_topics())
 
@@ -97,8 +131,21 @@ def get_related_data():
             })
 
 
+
+@app.route("/recommendation", methods=["GET"], strict_slashes=False)
+def get_recommendation_data():
+    if len(request.args):
+        collabCount = request.args.get('collabCount')
+        cosineCount = request.args.get('cosineCount')
+        averageViews = request.args.get('view')
+        averageUpvote = request.args.get('upvotes')
+        support = request.args.get('support')
+        topic = request.args.get('topic')
+        return jsonify(filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, support))
+
+
 @app.route("/description", methods=["GET"], strict_slashes=False)
-def get_related_data():
+def get_description_():
     if len(request.args) != 0:
         topic = request.args.get('topic')
         if topic:
@@ -138,6 +185,7 @@ def get_question_list():
                     })
         except:
             print 'Error has occured when fetching the list of questions'
+
 
 
 

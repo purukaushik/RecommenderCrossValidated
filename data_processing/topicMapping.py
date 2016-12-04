@@ -55,8 +55,11 @@ low,high = argv[1], argv[2]
 questionSet = db[QUESTIONS].find({}).sort("Question_id", 1)[int(low):int(high)]
 count = 0
 #db[POSTS].drop()
-
+posts_q = map(lambda x: x.get("Question_id"), db[POSTS].find({}, {"Question_id": 1}))
 for question in questionSet:
+    if question.get("Question_id") in posts_q:
+        print "Skipping : " + str(question.get("Question_id"))
+        continue
     answers = []
     answerObjectList = []
     if question.get("Answer_count") > 0:
