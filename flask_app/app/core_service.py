@@ -10,9 +10,11 @@ DB = 'dvproject'
 PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
-TOPICS = 'dbtopics0'
 PERCENTILES = 'dbmetadata0'
+TOPICS = 'dbtopics0'
 AGGREGATE = 'dbaggregate0'
+METADATA = 'dbmetadata0'
+
 # Flask INIT
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -87,7 +89,7 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
     return {"collab": collabvalues, "cosine": cosineValues}
 
 
-def filterByFilter(averageUpvote, averageViews, collabvalues, support):
+def filterByFilter(averageUpvote, averageViews, collabvalues, support, count):
     AVP__ = unicode(MAPPING.get(int(averageViews)))
     QSP__ = unicode(MAPPING.get(int(averageUpvote)))
     SSP__ = unicode(MAPPING.get(int(support)))
@@ -101,10 +103,22 @@ def filterByFilter(averageUpvote, averageViews, collabvalues, support):
         k__ = cursor[0].get(quirk)
         return low <= k__ and k__ <= high
 
-    collabvalues = filter(lambda x: genFilterFn(x.get("name"), "Avg_Question_score", avuLow, avuHigh), collabvalues)
-    collabvalues = filter(lambda x: genFilterFn(x.get("name"), "Avg_View_count", avLow, avHigh), collabvalues)
-    collabvalues = filter(lambda x: genFilterFn(x.get("name"), "Support_Percentile", sspLow, sspHigh), collabvalues)
-    return collabvalues
+    scoreFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_Question_score", avuLow, avuHigh), collabvalues)
+    viewFilter = filter(lambda x: genFilterFn(x.get("name"), "Avg_View_count", avLow, avHigh), collabvalues)
+    supportFilter = filter(lambda x: genFilterFn(x.get("name"), "Support_Percentile", sspLow, sspHigh), collabvalues)
+    resultValues = List(set(scoreFilter) & set(viewFilter) & set(supportFilter))
+
+    def commonElementsNotAlreadyIncluded(resultList, list1, list2=None):
+        if list2:
+            return List((set(list1) & set(list2)) - set(resultList))
+        else:
+            return List(set(list1) - set(resultList))
+
+    if resultValues.length < count:
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, scoreFilter)
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, supportFilter)
+        resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, supportFilter, scoreFilter)
+    return resultValues
 
 
 @app.route("/", strict_slashes=False)
@@ -171,6 +185,49 @@ def get_description_():
             return jsonify({
                 "description": getDescription(topic)
             })
+
+
+def question_list(topic, question_order):
+    db_collection = conn[DB][AGGREGATE]
+    cursor = db_collection.find({"Topic": topic})
+    if cursor.count():
+        if question_order == 1:
+            return  cursor[0].get("Score_Question_list")
+        elif question_order == 2:
+            return cursor[0].get("View_Question_list")
+        elif question_order == 3:
+            return cursor[0].get("Recent_Question_list")
+        elif question_order == 4:
+            return cursor[0].get("Bounty_Question_list")
+        elif question_order == 5:
+            return cursor[0].get("Most_Answer_Question_list")
+        else:
+            return [{"Question": "Error - Option not found."}]
+    else:
+        return [{"Question": "Error - Option not found."}]
+
+
+@app.route("/recommendedQuestion", methods=["GET"], strict_slashes=False)
+def get_question_list():
+    if len(request.args) != 0:
+        try:
+            topic = request.args.get('topic')
+            if topic:
+                question_order = request.args.get('sortOrder')
+                if question_order:
+                    return jsonify({
+                        "topic": topic,
+                        "question": question_list(topic, int(question_order))
+                    })
+                else:
+                    return jsonify({"Error" : "No question_order"})
+            else:
+                return jsonify({"Error:":"No topic"})
+        except Exception as e:
+            print e.message
+            print 'Error has occured when fetching the list of questions'
+    return jsonify({})
+
 
 
 if __name__ == '__main__':

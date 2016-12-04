@@ -78,7 +78,7 @@
                 </div>              
                 
                 <div id="recommender-type">                    
-                    <h1>Recommendation Preference</h1>
+                    <h1>Recommendation Preference</h1>                    
                     <div>
                         <input type="range" min="1"max="10" step="1" value="5"  id="recommendationTypeCountInput">
                     </div>
@@ -96,7 +96,15 @@
                     R is a programming language and software environment for statistical computing and graphics supported by the R Foundation for Statistical Computing. The R language is widely used among statisticians and data miners for developing statistical software and data analysis.
                 </div>
 
-            	<h1>Recommendations</h1>
+            	<h1>Posts that might interest you.</h1> 
+                <label class="questionSortOrder ">Sort By:</label>
+                <select id="questionSortOrder">
+                    <option value="1">Question Score</option>
+                    <option value="2">Post Views</option>
+                    <option value="3">Recent</option>
+                    <option value="4">Bounty Questions</option>
+                    <option value="5">Number of Answers</option>
+                </select>
             	<div>
             		<a href="#" target="_blank">Making sense of principal component analysis, eigenvectors & eigenvalues.</a>
 	            	<a href="#" target="_blank">The Two Cultures: statistics vs. machine learning?</a>
@@ -107,7 +115,16 @@
         </div>
 
     </div>
-
+    <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+           <input type="text" class="form-control" placeholder="Search for Topic" id="initialSearchText">
+            <div id="loadingGif"></div>
+          </div>          
+        </div>
+      </div>
+    </div>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="resources/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="resources/js/rangeslider.min.js"></script>
