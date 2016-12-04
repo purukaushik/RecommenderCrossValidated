@@ -79,15 +79,19 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
     # 1. COLLAB
     # .. i. Get the collab topics from DB with metric, sort them by value
     cursor = conn[DB][COLLAB_FILTER].find({"name": topic}, {"related_topics": 1})
+    
     collabvalues = sorted(cursor[0].get('related_topics'),key=lambda x: x.get('value'), reverse=True)
     collabvalues = map(lambda x: (x.get('name'), x.get('value')), collabvalues)
-    
+    collabvalues = filter(lambda x: x[0]!=topic, collabvalues)
+
     cursor = conn[DB][COSINE_SIM].find({"name": topic}, {"related_topics": 1})
     cosineValues = sorted(cursor[0].get('related_topics'), key=lambda x: x.get('value'), reverse=True)
     cosineValues = map(lambda x: (x.get('name'), x.get('value')), cosineValues)     
+    cosineValues = filter(lambda x: x[0]!=topic, cosineValues)
+
     collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues,support,collabCount)
     cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues,support, cosineCount)
-
+    
     return {"collab": collabvalues, "cosine": cosineValues}
 
 
@@ -123,13 +127,16 @@ def filterByFilter(averageUpvote, averageViews, collabvalues, support, count):
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, scoreFilter)
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, viewFilter, supportFilter)
         resultValues = resultValues + commonElementsNotAlreadyIncluded(resultValues, supportFilter, scoreFilter)
-    print resultValues
-    for i,v in groupby(resultValues,lambda y: y[0]):
-        print max(list(v), key=lambda x: x[2])
-
-    return map(lambda x: max(list(x[1]), key=lambda z:z[2]),
-            groupby(resultValues, lambda y: y[0]))
-
+    resultList = map(lambda x: max(list(x[1]), key=lambda z:z[2]),
+            groupby(sorted(resultValues, key=lambda c: c[0]), lambda y: y[0]))
+    resultList = sorted(resultList, key=lambda x:x[1], reverse=True )
+    if len(resultList) >= count:
+        print len(resultList), count
+        print "more than what we need"
+        return resultList[0:count]
+    else:
+        print len(resultList)
+        return resultList
 
 @app.route("/", strict_slashes=False)
 def home():
@@ -176,8 +183,8 @@ def get_related_data():
 @app.route("/recommendation", methods=["GET"], strict_slashes=False)
 def get_recommendation_data():
     if len(request.args):
-        collabCount = request.args.get('collabCount')
-        cosineCount = request.args.get('cosineCount')
+        collabCount = int(request.args.get('collabCount'))
+        cosineCount = int(request.args.get('cosineCount'))
         averageViews = request.args.get('view')
         averageUpvote = request.args.get('upvotes')
         support = request.args.get('support')
