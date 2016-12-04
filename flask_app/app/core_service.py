@@ -12,7 +12,7 @@ PAGE_NO = 'pageNo'
 COLLAB_FILTER = 'dbrelposts0'
 COSINE_SIM = 'dbrelcosineposts0'
 PERCENTILES = 'dbmetadata0'
-TOPICS = 'dbtopics0'
+TOPICS = 'dbtopics5'
 AGGREGATE = 'dbaggregate0'
 METADATA = 'dbmetadata0'
 
@@ -55,9 +55,9 @@ def get(algo, topic, list_topics=False):
 
 
 def getDescription(topic):
-    cursor = conn[DB][TOPICS].find({"name": unicode(topic)}, {"desc": 1})
+    cursor = conn[DB][TOPICS].find({"Topic": unicode(topic)}, {"Description": 1})
     if cursor.count():
-        description = str(cursor[0].get("desc"))
+        description = str(cursor[0].get("Description"))
     else:
         description = {}
     return description
@@ -91,8 +91,12 @@ def filter_reco(topic, collabCount, cosineCount, averageViews, averageUpvote, su
 
     collabvalues = filterByFilter(averageUpvote, averageViews, collabvalues,support,collabCount)
     cosineValues = filterByFilter(averageUpvote, averageViews, cosineValues,support, cosineCount)
-    
-    return {"collab": collabvalues, "cosine": cosineValues}
+    print collabvalues
+    collab = [{"name": x[0], "value": x[1], "weight": x[2]} for x in
+            collabvalues]
+    cosine = [{"name": x[0], "value": x[1], "weight": x[2]} for x in
+            cosineValues]
+    return {"collab": collab, "cosine": cosine}
 
 
 def filterByFilter(averageUpvote, averageViews, collabvalues, support, count):
