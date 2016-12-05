@@ -72,8 +72,7 @@ function loadRecommendations(topic) {
     collabCount = recommendationCount - contentCount;  
     localStorage.setItem("topic", topic);  
     $.ajax({
-        url: baseURL + "/recommendation?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&cosineCount="+contentCount, 
-        //url: baseURL + "/collabf?topic="+topic, 
+        url: baseURL + "/recommendation?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&cosineCount="+contentCount,         
         jsonp: true
     }).done(function(responseData) {                
         var NODE_RADIUS = [40, 50, 60]
@@ -83,14 +82,24 @@ function loadRecommendations(topic) {
         var rootEdges = {}
         
         function structureNodes(nodesList, type) {
+            var START_EDGE_WEIGHT = 2;
+            let set = new Set();
             for(i=0; i<nodesList.length; i++) {
-                node = nodes[nodesList[i].name]
+                set.add(nodesList[i].value);
+            }
+            var edgeWeightList = Array.from(set).sort(),
+            step = 8 / edgeWeightList.length;
+            for(i=0; i<nodesList.length; i++) {
+                var node = nodes[nodesList[i].name],
+                index = edgeWeightList.indexOf(nodesList[i].value),
+                edgeWeight = START_EDGE_WEIGHT + index * step;
                 if(node) {
-                    node.type = 'B'
-                    node.radius = node.radius < NODE_RADIUS[nodesList[i].weight] ? NODE_RADIUS[nodesList[i].weight] : node.radius
+                    node.type = 'B'                    
+                    node.radius = node.radius < NODE_RADIUS[nodesList[i].weight-1] ? NODE_RADIUS[nodesList[i].weight-1] : node.radius
+                    rootEdges[nodesList[i].name].weight = rootEdges[nodesList[i].name].weight < edgeWeight ? edgeWeight : rootEdges[nodesList[i].name].weight
                 } else {
-                    nodes[nodesList[i].name] = {radius: NODE_RADIUS[nodesList[i].weight], type: type, name: nodesList[i].name}
-                    rootEdges[nodesList[i].name] = {weight: (10 - i/2)}
+                    nodes[nodesList[i].name] = {radius: NODE_RADIUS[nodesList[i].weight-1], type: type, name: nodesList[i].name}
+                    rootEdges[nodesList[i].name] = { weight: edgeWeight }
                 }                
             }
         }

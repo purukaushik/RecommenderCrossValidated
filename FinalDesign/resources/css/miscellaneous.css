@@ -82,3 +82,28 @@ div#loadingGif {
 .modal-open .modal {
   background: rgba(0,0,0,0.5);
 }
+nav.navbar.navbar-default{
+  background: black;
+  border: #000;
+}
+.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus, a.navbar-brand {
+  text-shadow: none;
+  color: #FFF !important;
+}
+
+div#legend {
+  width: 150px;
+  display: inline-block;
+  float: right;
+  margin-top: -30px;
+}
+div.legendBox {
+  width: 25px;
+  display: inline-block;
+  height: 25px;
+  margin: 5px 5px -5px;
+}
+
+div.legendBox.collab { background: #74C8FF; }
+div.legendBox.cosine { background: #FF5252; }
+div.legendBox.both { background: #A27AFF; }

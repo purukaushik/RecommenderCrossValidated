@@ -73,8 +73,8 @@
                     <div>
                         <input type="range" min="1"max="20" step="1" value="15" id="recommendationCountInput">
                     </div>
-                    <h3 class="sub-heading width-half text-left">1</h3>
-                    <h3 class="sub-heading width-half text-right">20</h3>
+                    <h3 class="sub-heading width-half text-left">Low</h3>
+                    <h3 class="sub-heading width-half text-right">High</h3>
                 </div>              
                 
                 <div id="recommender-type">                    
@@ -89,6 +89,11 @@
             <div class="col-md-6" id="contentPane">
                 <h1></h1>
             	<canvas id="graph" width="660" height="600"></canvas>
+                <div id="legend">
+                    <div class="legendBox collab"></div><span>User Interest</span>
+                    <div class="legendBox cosine"></div><span>Content Similarity</span>
+                    <div class="legendBox both"></div><span>Both</span>
+                </div>
             </div>
             <div class="col-md-3" id="recommendations">            
                 <h1 id="descriptionHeading">Description</h1>

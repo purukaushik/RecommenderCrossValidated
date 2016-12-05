@@ -86,8 +86,9 @@ input[type="range"]:focus + .rangeslider .rangeslider__handle {
   background: #F7B32B;
 }
 
-#support .rangeslider {  
+#support .rangeslider {    
   background: #946CCB;
+  background: #AAA839;
 }
 
 #recommendation-count .rangeslider__fill {  
