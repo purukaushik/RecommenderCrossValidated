@@ -1,6 +1,6 @@
 # 1 What — [ M ]
 
-## Our system is a visual recommender for people who are new to statistics. 
+## Our system is a visual recommender for people who are new to the field of statistics. 
 
 ## It will act as a guide in progressing from topics they know to topics that are new to them.
 
@@ -8,21 +8,23 @@
 
 # 2 Who
 
-## This application is targeted towards self-motivated learners who use online platforms, MOOCs(Massively Open Online Courses) and utilize online discussion forums to gain clarity and further their knowledge.
+## This application is targeted towards self-motivated 	learners who use online platforms, MOOCs(Massively Open Online Courses) and utilize online discussion forums to gain clarity and further their knowledge.
 
-##### <!!! SOMETHING MORE GOES HERE !!!!>
+##### 
 
 # 3 How
 
-## The learning process starts in the system when the user inputs a term that he/she is familiar with. The system then makes recommendation of topics that are closer to it. In place of getting a black box recommendation where the user cannot reason about the recommendation they receive, the user would be able to calibrate the factors resulting in the recommendations he/she receives.
+## When the user inputs a term or topic that she is familiar with, the system makes recommendation of topics that are relevant to it. 
 
-## The recommender has an intuitive visual design that enables him/her to visually process the related topics and how closely each is related to the topic searched.
+## In place of getting a black box recommendation where the user cannot reason about the recommendation she receives, the user would be able to calibrate the factors resulting in the recommendations she receives.
 
-
+## The recommender has an intuitive visual design that enables her to visually process the related topics and how closely each is related to the topic searched.
 
 # 4 Why
 
-## Cross validated is a online hub for learners to post their queries and subject experts who take time to explain/answer the questions. So this is a good place to build models of user interests. This generated model can help in making relevant recommendations to our user.
+## Cross validated is a online hub for learners to post their queries and subject experts who take time to explain/answer the questions. 
+
+## So, this is a good place to build models of user interests. This generated model of user interests can help in making relevant recommendations to our user.
 
 # 5 Recommendation systems
 
@@ -38,15 +40,13 @@
 
 ## The content based recommender computes a cosine similarity between posts and their corresponding topics. This metric is again used in the visualization
 
-
-
 # 7 Filters
 
-## The user can curate topics recommended to him/her through filters that capture popularity of topics on Cross Validated and their support from the community.
+## The user can curate topics recommended to her through filters that capture popularity of topics on Cross Validated and their support from the community.
 
 ## Rationale behind the filters — System lets the user intuitively adjust factors that help calibrating the recommendations. 
 
-## The filters are based on a topic's popularity which can be gauged from the average upvotes of posts in a topic and the average views posts in a topic receives.
+## The filters are based on a topic's popularity which can be gauged from the average upvotes of posts in a topic and the average views, posts in a topic receives.
 
 ## The values for these can be set between `Low`, `Medium` and `High`. 
 
