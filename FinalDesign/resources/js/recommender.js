@@ -1,5 +1,4 @@
-//var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
-var baseURL = "http://192.168.0.16:3000"
+var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
 $(document).ready(function(){
     $("#initialSearchText").hide();
     $('input[type="range"]').rangeslider({
