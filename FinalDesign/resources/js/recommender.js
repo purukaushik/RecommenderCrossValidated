@@ -1,11 +1,12 @@
-var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
+//var baseURL = "http://ec2-52-43-158-164.us-west-2.compute.amazonaws.com:3000"
+var baseURL = "http://192.168.0.16:3000"
 $(document).ready(function(){
     $("#initialSearchText").hide();
     $('input[type="range"]').rangeslider({
         polyfill: false,
         onInit: function() {},
         onSlide: function(position, value) { },
-        onSlideEnd: function(position, value) { loadRecommendations(localStorage.getItem("topic")); }
+        onSlideEnd: function(position, value) { loadRecommendations(localStorage.getItem("topic"));     }
     });            
                    
     $.ajax({
@@ -20,22 +21,47 @@ $(document).ready(function(){
                     var results = $.ui.autocomplete.filter(availableTags, request.term);
                     results = results.slice(0, 10)
                     if(results.length == 0) {
-                        results.push({label: "Sorry No Match :(", value: ""})
+                        results.push({"label" : "Sorry No Match :(", "value" : ''})
                     } 
                     response(results);
                 },
-            select: function( event, ui ) {
-                if(ui.item.value != "") {
+            select: function( event, ui ) {                
+                if(ui.item.value != "Sorry No Match :(") {
                     loadRecommendations(ui.item.value); 
                     $("#myModal").modal('hide')                 
-                }                
+                } else {
+                    $(event.target).val("")
+                }           
             }
         });        
         $("#loadingGif").hide();
         $("#initialSearchText").show();
     });                
+
+    $("#questionSortOrder").on("change", function(event){
+        loadQuestions(localStorage.getItem("topic")) 
+    })
     $("#myModal").modal({show: true, backdrop: 'static', keyboard: false})
 });
+
+function loadQuestions(topic) {
+    $.ajax({
+        url: baseURL + "/recommendedQuestion?topic=" + 
+            topic + "&sortOrder=" +  $("#questionSortOrder").val(), 
+        jsonp: true
+    }).done(function(responseData) {
+        if(responseData.question.length == 0) {
+            $("#postRecommendations").html("No recommendation available. Try other sorting lists.")
+        } else {
+            var content = ""
+            for(i=0; i<responseData.question.length; i++) {
+                content += '<a href="'+responseData.question[i].Link+'" target="_blank">'
+                +responseData.question[i].Title+'</a>';
+            }
+            $("#postRecommendations").html(content);
+        }
+    }); 
+}
 
 function loadRecommendations(topic) {
     $("#contentPane h1").text(topic.replace("-", " "));
@@ -43,30 +69,44 @@ function loadRecommendations(topic) {
     rating = $("#averageRatingInput").val(),
     support = $("#supportInput").val(),
     recommendationCount = $("#recommendationCountInput").val(),
-    contentCount = $("#recommendationTypeCountInput").val(),
+    contentCount = Math.floor(($("#recommendationTypeCountInput").val() / 10.0) * recommendationCount),
     collabCount = recommendationCount - contentCount;  
     localStorage.setItem("topic", topic);  
     $.ajax({
-        //url: baseURL + "/recommendations?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&contentCount="+contentCount, 
-        url: baseURL + "/collabf?topic="+topic, 
+        url: baseURL + "/recommendation?topic="+topic+"&view="+view+"&upvotes="+rating+"&support="+support+"&collabCount="+collabCount+"&cosineCount="+contentCount, 
+        //url: baseURL + "/collabf?topic="+topic, 
         jsonp: true
     }).done(function(responseData) {                
-        topics = responseData;
-        topics.sort(function(a,b) {return (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0);} );
-        topics = topics.filter(function(element) { return element.name != topic && element.value > 0});
-        if(topics.length > 10) {
-            topics = topics.slice(0, 20);   
-        }
+        var NODE_RADIUS = [40, 50, 60]
         var graph = {}
-        var nodes = { 1: {radius: 50, type: 'R', name: topic, fixed: true}}
+        var nodes ={}
+        nodes[topic] = {radius: 50, type: 'R', name: topic, fixed: true}
         var rootEdges = {}
-        for(i=0; i<topics.length; i++) {
-            nodes[i+2] = {radius: 50, type: 'C', name: topics[i].name}
-            rootEdges[i+2] = {weight: (10 - i/2)}
+        
+        function structureNodes(nodesList, type) {
+            for(i=0; i<nodesList.length; i++) {
+                node = nodes[nodesList[i].name]
+                if(node) {
+                    node.type = 'B'
+                    node.radius = node.radius < NODE_RADIUS[nodesList[i].weight] ? NODE_RADIUS[nodesList[i].weight] : node.radius
+                } else {
+                    nodes[nodesList[i].name] = {radius: NODE_RADIUS[nodesList[i].weight], type: type, name: nodesList[i].name}
+                    rootEdges[nodesList[i].name] = {weight: (10 - i/2)}
+                }                
+            }
         }
+        
+        if(responseData.collab.length > 0) {
+            structureNodes(responseData.collab, 'S')
+        }
+
+        if(responseData.cosine.length > 0) {
+            structureNodes(responseData.cosine, 'C')
+        }
+
         graph["nodes"] = nodes
         graph["edges"] = {}
-        graph["edges"][1] = rootEdges
+        graph["edges"][topic] = rootEdges
         if($("div#contentPane #graph")) {
             $("div#contentPane #graph").remove()
             $("div#contentPane").append("<canvas id='graph' width='660' height='600'></canvas>")
@@ -74,7 +114,9 @@ function loadRecommendations(topic) {
         loadGraph(graph)
     });
     loadDescription(topic, false)
+    loadQuestions(topic)
 }
+
 var currentTopic;
 function loadDescription(topic, addTopicToHeading){
     if(currentTopic != topic) {
@@ -84,8 +126,12 @@ function loadDescription(topic, addTopicToHeading){
             jsonp: true
         }).done(function(responseData) {                
             var heading = "Description" + (addTopicToHeading ?  "- " + camelize(topic) : "");
-            $("#descriptionHeading").html(heading);            
-            $("#description").html(responseData.description);
+            $("#descriptionHeading").html(heading);       
+            if(responseData.description) {
+                $("#description").html(responseData.description);
+            } else {
+                $("#description").html("Description unavailable.");
+            }              
         }); 
     }    
 }
