@@ -22,7 +22,7 @@ $(document).ready(function(){
                     if(results.length == 0) {
                         results.push({"label" : "Sorry No Match :(", "value" : ''})
                     } 
-                    response(results);
+                    response(results.sort());
                 },
             select: function( event, ui ) {                
                 if(ui.item.value != "Sorry No Match :(") {
