@@ -8,7 +8,9 @@ body h1 {
 #sideboard {
   min-height: 100vh;
   background: #333;
-  margin-top: -20px;
+  margin-top: -70px;
+  padding-top: 55px;
+  z-index: 0;
   color: #FFF;
 }
 div{
@@ -20,8 +22,10 @@ nav div.navbar-form button .glyphicon-search{
 #recommendations {
   min-height: 100vh;
   background: #ddd;
-  background: #3EC5D2;  /*#17A9BA;*/
-  margin-top: -20px;
+  background: #3EC5D2;  /*#17A9BA;*/  
+  margin-top: -70px;
+  padding-top: 60px;
+  z-index: 0;
   color: #333;
 }
 #recommendations h1 {
@@ -45,6 +49,10 @@ nav div.navbar-form button .glyphicon-search{
   color: #444;
   color: #045858;
   box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
+}
+#postRecommendations {  
+  max-height: 275px;
+  overflow: scroll;
 }
 
 #contentPane h1 {
@@ -91,6 +99,7 @@ nav.navbar.navbar-default{
   background: #607D8B;
   border: #000;
   border-radius: 0px;
+  z-index: 2;
 }
 .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus, a.navbar-brand {
   text-shadow: none;
@@ -113,3 +122,14 @@ div.legendBox {
 div.legendBox.collab { background: #74C8FF; }
 div.legendBox.cosine { background: #FF5252; }
 div.legendBox.both { background: #A27AFF; }
+
+@media (max-width: 500px) {
+  body h1 {
+    margin-top: 0px;
+    padding-top: 20px;
+  }
+  #recommendations, #sideboard {
+    margin-top: -20px;
+    padding-top: 0px;
+  }
+}

@@ -36,6 +36,24 @@
             <div class="col-md-3" id="sideboard">
             	<h1>Filters</h1>
             	<div id="averageRating">
+                    <div id="recommendation-count">
+                        <h1># of Recommendations</h1>
+                        <div>
+                            <input type="range" min="1"max="20" step="1" value="15" id="recommendationCountInput">
+                        </div>
+                        <h3 class="sub-heading width-half text-left">Low</h3>
+                        <h3 class="sub-heading width-half text-right">High</h3>
+                    </div>              
+                    
+                    <div id="recommender-type">                    
+                        <h1>Recommendation Preference</h1>                    
+                        <div>
+                            <input type="range" min="1"max="10" step="1" value="5"  id="recommendationTypeCountInput">
+                        </div>
+                        <h3 class="sub-heading text-left width-half">Content Similarity</h3>
+                        <h3 class="sub-heading text-right width-half">User Interest</h3>
+                    </div>
+                    <hr/>
             		<h1>Average Upvote to questions</h1>
             		<div>
             			<input type="range" min="0" max="2" step="1" value="1" id="averageRatingInput" >
@@ -61,24 +79,7 @@
                     <h3 class="sub-heading width-third text-left">Low</h3>
                     <h3 class="sub-heading width-third text-center">Medium</h3>
                     <h3 class="sub-heading width-third text-right">High</h3>
-                </div>
-                <div id="recommendation-count">
-                    <h1># of Recommendations</h1>
-                    <div>
-                        <input type="range" min="1"max="20" step="1" value="15" id="recommendationCountInput">
-                    </div>
-                    <h3 class="sub-heading width-half text-left">Low</h3>
-                    <h3 class="sub-heading width-half text-right">High</h3>
-                </div>              
-                
-                <div id="recommender-type">                    
-                    <h1>Recommendation Preference</h1>                    
-                    <div>
-                        <input type="range" min="1"max="10" step="1" value="5"  id="recommendationTypeCountInput">
-                    </div>
-                    <h3 class="sub-heading text-left width-half">Content Similarity</h3>
-                    <h3 class="sub-heading text-right width-half">User Interest</h3>
-                </div>
+                </div>                
             </div>
             <div class="col-md-6" id="contentPane">
                 <h1></h1>

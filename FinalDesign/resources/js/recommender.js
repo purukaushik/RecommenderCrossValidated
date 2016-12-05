@@ -22,7 +22,7 @@ $(document).ready(function(){
                     if(results.length == 0) {
                         results.push({"label" : "Sorry No Match :(", "value" : ''})
                     } 
-                    response(results.sort());
+                    response(results.sort(function(a,b) {return (a.label > b.label) ? 1 : ((b.label > a.label) ? -1 : 0);} ));
                 },
             select: function( event, ui ) {                
                 if(ui.item.value != "Sorry No Match :(") {
@@ -117,7 +117,11 @@ function loadRecommendations(topic) {
         graph["edges"][topic] = rootEdges
         if($("div#contentPane #graph")) {
             $("div#contentPane #graph").remove()
-            $("div#contentPane").append("<canvas id='graph' width='660' height='600'></canvas>")
+            var width = $(window).width(), 
+            height = $(window).height();
+            width = (width < 500) ? width - 20 : width * 0.48
+            height = ($(window).width() <= 500) ? 500 : height - 150
+            $("div#contentPane").append("<canvas id='graph' width='"+width+"' height='"+height+"'></canvas>")
         }
         loadGraph(graph)
     });

@@ -74,25 +74,28 @@ input[type="range"]:focus + .rangeslider .rangeslider__handle {
   box-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
 }
 
-.rangeslider__fill {
-  background: #e6e6e6;
+.rangeslider {
+  background: #666;
 }
 
-#averageRating .rangeslider {
+#averageRating .rangeslider__fill {
   background: #B9BAA3;
 }
 
-#averageView .rangeslider {  
+#averageView .rangeslider__fill {  
   background: #F7B32B;
 }
 
-#support .rangeslider {    
+#support .rangeslider__fill {    
   background: #946CCB;
   background: #AAA839;
 }
 
-#recommendation-count .rangeslider__fill {  
+#recommendation-count .rangeslider__fill {
   background: #63CBA1;
+}
+#recommendation-count .rangeslider__fill {  
+  /*background: #63CBA1; */
 }
 
 #recommender-type .rangeslider__fill {
@@ -101,11 +104,19 @@ input[type="range"]:focus + .rangeslider .rangeslider__handle {
 #recommender-type .rangeslider {
   background: #74C8FF 
 }
+
+#recommender-type .rangeslider__handle {
+  background-color: #e6e6e6
+}
+.rangeslider__handle {
+  width: 20px;
+  background-color: #e6e6e6
+}
 h3.sub-heading{
   font-size: 15px;
   padding: 0px;
   display: inline-block;  
-  margin: 5px 0px;
+  margin: 15px 0px 0px;
   font-weight: 200;
 }
 .width-half {
